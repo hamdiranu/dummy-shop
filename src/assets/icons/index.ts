@@ -9,6 +9,8 @@ import ProfileIcon from './profile.svg'
 import SignOutIcon from './sign-out.svg'
 import RevenueIcon from './revenue.svg'
 import UsersIcon from './users.svg'
+import EditIcon from './edit.svg'
+import TrashIcon from './trash.svg'
 
 export {
   CartIcons,
@@ -22,4 +24,6 @@ export {
   SignOutIcon,
   RevenueIcon,
   UsersIcon,
+  EditIcon,
+  TrashIcon,
 }

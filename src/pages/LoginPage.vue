@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-50">
-    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <div class="bg-white p-8 m-6 rounded shadow-md w-full max-w-md">
       <h2 class="text-2xl font-bold text-center mb-2">Sign in</h2>
       <p class="text-center text-sm text-gray-500 mb-6">
         Enter your credentials to access the e-commerce dashboard
@@ -71,24 +71,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { AxiosError } from 'axios'
 import { useMutation } from '@tanstack/vue-query'
-import api from '@/api'
-
-interface LoginPayload {
-  username: string
-  password: string
-}
-
-interface LoginResponse {
-  accessToken: string
-  refreshToken: string
-  id: number
-  username: string
-  email: string
-  firstName: string
-  lastName: string
-  gender: string
-  image: string
-}
+import { loginUser, type LoginPayload, type LoginResponse } from '@/service'
 
 const router = useRouter()
 
@@ -99,16 +82,12 @@ const usernameError = ref(false)
 const passwordError = ref(false)
 
 // login function
-const loginUser = async (payload: LoginPayload): Promise<LoginResponse> => {
-  const res = await api.post('https://dummyjson.com/auth/login', payload)
-  return res.data
-}
 
 // mutation
 const mutation = useMutation<LoginResponse, unknown, LoginPayload>({
   mutationFn: loginUser,
   onSuccess: (data) => {
-    alert('Login success!')
+    alert(`Login success!\nWelcomeback, ${data.firstName}!`)
     // Save entire auth data to localStorage
     localStorage.setItem('authToken', data.accessToken)
     localStorage.setItem('refreshToken', data.refreshToken)
