@@ -3,9 +3,8 @@
   <aside
     id="drawer-navigation"
     :class="[
-      'w-64 bg-white border-r border-[0] border-[#e5e7eb] fixed md:static z-40 min-h-screen h-screen flex flex-col justify-between transition-transform duration-300',
-      isOpen ? 'translate-x-0' : '-translate-x-full',
-      'md:translate-x-0',
+      'w-[14%] bg-white border-r border-[0] border-[#e5e7eb] fixed z-40 min-h-screen h-screen flex flex-col justify-between transition-transform duration-300',
+      props.isOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
     tabindex="-1"
     aria-labelledby="drawer-navigation-label"
@@ -30,7 +29,7 @@
           class="flex items-center gap-2 py-2 px-3 rounded hover:bg-gray-100 transition-colors"
           active-class="bg-gray-100 font-medium"
         >
-          <component :is="link.icon" class="w-4 h-4 text-gray-500" />
+          <component :is="link.icon" class="w-4 h-4" />
           <span>{{ link.name }}</span>
         </RouterLink>
       </nav>
@@ -46,44 +45,22 @@
         <span class="text-gray-700 truncate">{{ user.fullName }}</span>
       </button>
 
-      <!-- Dropdown Menu -->
+      <!-- Dropdown Menu with shadow -->
       <div
         v-if="showDropdown"
-        class="absolute bottom-14 left-4 w-48 bg-white border rounded shadow-lg text-sm z-50"
+        class="absolute bottom-14 left-4 w-[90%] bg-white border-gray-200 border-1 rounded shadow-md text-sm z-50"
       >
-        <div class="font-semibold px-4 py-2 border-b">My Account</div>
+        <div class="font-semibold px-4 py-2">My Account</div>
         <RouterLink to="/profile" class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100">
           <!-- Profile icon -->
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M5.121 17.804A11.966 11.966 0 0112 15c2.485 0 4.779.76 6.879 2.05M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
+          <ProfileIcon class="w-4 h-4" />
           Profile
         </RouterLink>
-        <button class="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100 text-left">
+        <button
+          class="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100 text-left cursor-pointer"
+        >
           <!-- Logout icon -->
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 002 2h3a2 2 0 002-2v-1m-7-4v-1a2 2 0 00-2-2H7a2 2 0 00-2 2v1"
-            />
-          </svg>
+          <SignOutIcon class="w-4 h-4" />
           Sign out
         </button>
       </div>
@@ -100,6 +77,8 @@ import {
   OrderIcons,
   ProductIcon,
   ShopIcon,
+  ProfileIcon,
+  SignOutIcon,
 } from '@/assets/icons'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
@@ -112,7 +91,7 @@ interface User {
   image: string
 }
 
-defineProps<{
+const props = defineProps<{
   isOpen: boolean
 }>()
 
