@@ -1,5 +1,7 @@
 <template>
-  <Pie :data="chartData" :options="chartOptions" />
+  <div class="h-[30dvh] flex items-center justify-center">
+    <Pie :data="chartData" :options="chartOptions" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -21,20 +23,35 @@ const chartData = {
 
 const chartOptions: ChartOptions<'pie'> = {
   responsive: true,
+  plugins: {
+    tooltip: {
+      callbacks: {
+        label: function (context) {
+          const data = context.dataset.data as number[]
+          const total = data.reduce((a, b) => a + b, 0)
+          const value = context.parsed
+          const percentage = ((value / total) * 100).toFixed(1)
+          return `${context.label}: ${percentage}%`
+        },
+      },
+    },
+    legend: {
+      position: 'bottom',
+      labels: {
+        padding: 50,
+      },
+    },
+  },
   animation: {
     duration: 800,
     easing: 'easeOutBounce',
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-    },
   },
 }
 </script>
 
 <style scoped>
 canvas {
-  max-height: 50dvh;
+  max-height: 30dvh;
+  width: 100%;
 }
 </style>

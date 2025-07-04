@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/components/layout/MainLayout.vue'
 import { DashboardPage, ProductsPage, LoginPage, NotFoundPage } from '@/pages'
+import ShopPage from '@/pages/ShopPage.vue'
+import CartPage from '@/pages/CartPage.vue'
+import OrdersPage from '@/pages/OrdersPage.vue'
 
 const routes = [
   {
@@ -18,6 +21,24 @@ const routes = [
         path: 'products',
         name: 'Products',
         component: ProductsPage,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'shop',
+        name: 'Shop',
+        component: ShopPage,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'cart',
+        name: 'Cart',
+        component: CartPage,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'orders',
+        name: 'Orders',
+        component: OrdersPage,
         meta: { requiresAuth: true },
       },
     ],

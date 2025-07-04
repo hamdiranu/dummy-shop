@@ -22,7 +22,8 @@ defineProps<{
   title: string
   subtitle: string
   value: string | number
-  icon?: string // or define proper type like Component
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon?: any // or define proper type like Component
   isLoading?: boolean
 }>()
 </script>

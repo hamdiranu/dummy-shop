@@ -1,22 +1,14 @@
 <template>
-  <div class="space-y-4 w-[100%]">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+  <div class="space-y-4 w-[100%] gap-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
       <!-- Left side -->
       <div>
-        <h1 class="text-3xl font-bold text-[#09090B]">Products</h1>
-        <p class="text-md text-gray-500">Manage your product inventory</p>
+        <h1 class="text-3xl font-bold text-[#09090B]">Shop</h1>
+        <p class="text-md text-[#71717a]">Browse and purchase products</p>
       </div>
-
-      <!-- Right side -->
-      <button
-        class="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-900 text-white text-sm hover:bg-gray-800"
-      >
-        <PlusIcon class="h-5 w-5" />
-        Add Product
-      </button>
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-2">
+    <div class="flex flex-col sm:flex-row gap-4 mb-6">
       <!-- Search Bar -->
       <div class="flex items-center flex-1 border-[#e5e7eb] border-1 rounded-md px-3 py-2 bg-white">
         <MagnifyGlassIcon class="h-5 w-5 text-gray-400 mr-2" />
@@ -39,16 +31,28 @@
           {{ category.name }}
         </option>
       </select>
+
+      <!-- Sort Dropdown -->
+      <select
+        v-model="selectedSort"
+        class="text-sm border-[#e5e7eb] border-1 rounded-md px-3 py-2 bg-white w-full sm:w-[200px]"
+      >
+        <option value="default">Default</option>
+        <option value="name-asc">Name A-Z</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="rating-desc">Highest Rated</option>
+      </select>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-6">
       <!-- Products -->
       <ProductCard
         v-for="product in products"
         :key="product.id"
         :product="product"
         :isLoading="isFetching"
-        type="detail"
+        type="shop"
       />
     </div>
   </div>
@@ -59,7 +63,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { ProductCard } from '@/components/ui'
 import { fetchCategories, fetchProducts } from '@/service'
 import { computed, ref } from 'vue'
-import { MagnifyGlassIcon, PlusIcon } from '@/assets/icons'
+import { MagnifyGlassIcon } from '@/assets/icons'
 import api from '@/service/api'
 import type { IProduct } from '@/service/product/product.type'
 import { useDebounce } from '@/hooks'
@@ -86,15 +90,38 @@ const { data: productData, isFetching } = useQuery({
     selectedCategory.value ? fetchProductsByCategory(selectedCategory.value) : fetchProducts(),
 })
 
+const selectedSort = ref('default')
+
 const products = computed(() => {
   const items = productData?.value?.products ?? []
   const keyword = debouncedSearch.value.toLowerCase()
 
-  return items.filter(
+  // Filter products
+  const filtered: IProduct[] = items.filter(
     (product: IProduct) =>
       product.title.toLowerCase().includes(keyword) ||
       product.description.toLowerCase().includes(keyword) ||
       product.category.toLowerCase().includes(keyword),
   )
+
+  // Sort products based on selectedSort
+  switch (selectedSort.value) {
+    case 'name-asc':
+      filtered.sort((a, b) => a.title.localeCompare(b.title))
+      break
+    case 'price-asc':
+      filtered.sort((a, b) => a.price - b.price)
+      break
+    case 'price-desc':
+      filtered.sort((a, b) => b.price - a.price)
+      break
+    case 'rating-desc':
+      filtered.sort((a, b) => b.rating - a.rating)
+      break
+    default:
+      break
+  }
+
+  return filtered
 })
 </script>
