@@ -7,6 +7,8 @@ import ShopIcon from './shop.svg'
 import SidebarMenu from './sidebar-menu.svg'
 import ProfileIcon from './profile.svg'
 import SignOutIcon from './sign-out.svg'
+import RevenueIcon from './revenue.svg'
+import UsersIcon from './users.svg'
 
 export {
   CartIcons,
@@ -18,4 +20,6 @@ export {
   SidebarMenu,
   ProfileIcon,
   SignOutIcon,
+  RevenueIcon,
+  UsersIcon,
 }

@@ -3,14 +3,15 @@
   <aside
     id="drawer-navigation"
     :class="[
-      'w-[14%] bg-white border-r border-[0] border-[#e5e7eb] fixed z-40 min-h-screen h-screen flex flex-col justify-between transition-transform duration-300',
+      ' bg-white border-r border-[0] border-[#e5e7eb] fixed z-40 min-h-screen h-screen flex flex-col justify-between transition-transform duration-300',
+      'w-[65%] md:w-[14%]', // 👈 Responsive width
       props.isOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
     tabindex="-1"
     aria-labelledby="drawer-navigation-label"
   >
     <!-- Top Section -->
-    <div>
+    <div :class="[props.isOpen ? '' : 'hidden', ' transition-transform duration-300 ']">
       <!-- Brand -->
       <div class="p-4 font-semibold text-base flex items-center gap-2">
         <SidebarTitle class="w-4 h-4" />

@@ -15,12 +15,15 @@
   "dependencies": {
     "@tanstack/vue-query": "latest",
     "axios": "^1.10.0",
+    "chart.js": "^4.5.0",
     "vue": "^3.5.17",
+    "vue-chartjs": "^5.3.2",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.11",
     "@tsconfig/node22": "^22.0.2",
+    "@types/chart.js": "^2.9.41",
     "@types/node": "^22.15.32",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vitejs/plugin-vue-jsx": "^5.0.0",

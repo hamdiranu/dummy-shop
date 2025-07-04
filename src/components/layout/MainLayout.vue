@@ -7,8 +7,8 @@
       <Navbar @toggleSidebar="isSidebarOpen = !isSidebarOpen" :isOpen="isSidebarOpen" />
       <main
         :class="[
-          isSidebarOpen ? 'ml-[14%]' : 'ml-0',
           'p-6 transition-all flex flex-1 duration-300',
+          isSidebarOpen ? 'md:ml-[14%]' : 'ml-0',
         ]"
       >
         <RouterView />

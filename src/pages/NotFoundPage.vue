@@ -4,7 +4,7 @@
     <p class="text-xl text-gray-600 mt-4">Oops! Page not found.</p>
     <RouterLink
       to="/dashboard"
-      class="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      class="mt-6 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
     >
       Go to Dashboard
     </RouterLink>
