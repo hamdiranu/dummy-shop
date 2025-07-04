@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen bg-gray-50 text-gray-900">
+  <div class="flex min-h-screen text-gray-900">
     <Sidebar :isOpen="isSidebarOpen" />
 
     <!-- Adjusted layout container -->

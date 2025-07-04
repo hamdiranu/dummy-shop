@@ -11,6 +11,8 @@ import RevenueIcon from './revenue.svg'
 import UsersIcon from './users.svg'
 import EditIcon from './edit.svg'
 import TrashIcon from './trash.svg'
+import PlusIcon from './plus.svg'
+import MagnifyGlassIcon from './magnify-glass.svg'
 
 export {
   CartIcons,
@@ -26,4 +28,6 @@ export {
   UsersIcon,
   EditIcon,
   TrashIcon,
+  PlusIcon,
+  MagnifyGlassIcon,
 }

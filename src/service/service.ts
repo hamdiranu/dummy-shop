@@ -20,3 +20,8 @@ export const fetchCarts = async () => {
   const { data } = await api.get('https://dummyjson.com/carts')
   return data
 }
+
+export const fetchCategories = async () => {
+  const { data } = await api.get('https://dummyjson.com/products/categories')
+  return data
+}
