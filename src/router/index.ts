@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginPage from '@/pages/LoginPage.vue'
 import MainLayout from '@/components/layout/MainLayout.vue'
-import { DashboardPage, ProductsPage } from '@/pages'
+import { DashboardPage, ProductsPage, LoginPage, NotFoundPage } from '@/pages'
 
 const routes = [
   {
@@ -29,6 +28,11 @@ const routes = [
     component: LoginPage,
     meta: { requiresAuth: false },
   },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFoundPage,
+  },
 ]
 
 const router = createRouter({
@@ -46,7 +50,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !isAuthenticated()) {
     next({ name: 'Login' })
   } else if (to.name === 'Login' && isAuthenticated()) {
-    next({ name: 'Dashboard' }) // ✅ fixed redirect name
+    next({ name: 'Dashboard' })
   } else {
     next()
   }

@@ -48,18 +48,25 @@
       <!-- Dropdown Menu with shadow -->
       <div
         v-if="showDropdown"
-        class="absolute bottom-14 left-4 w-[90%] bg-white border-gray-200 border-1 rounded shadow-md text-sm z-50"
+        class="absolute bottom-14 left-4 w-[90%] bg-white border border-gray-200 rounded shadow-md text-sm z-50"
       >
         <div class="font-semibold px-4 py-2">My Account</div>
+
+        <!-- Divider -->
+        <div class="h-px my-1 bg-[#e5e7eb]"></div>
+
         <RouterLink to="/profile" class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100">
-          <!-- Profile icon -->
           <ProfileIcon class="w-4 h-4" />
           Profile
         </RouterLink>
+
+        <!-- Divider -->
+        <div class="h-px my-1 bg-[#e5e7eb]"></div>
+
         <button
+          @click="handleSignOut"
           class="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100 text-left cursor-pointer"
         >
-          <!-- Logout icon -->
           <SignOutIcon class="w-4 h-4" />
           Sign out
         </button>
@@ -69,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import {
   CartIcons,
   DashboardIcons,
@@ -143,4 +150,13 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
+const router = useRouter()
+
+const handleSignOut = () => {
+  localStorage.removeItem('authToken')
+  localStorage.removeItem('refreshToken')
+  localStorage.removeItem('user')
+  router.push('/login')
+}
 </script>
