@@ -9,6 +9,7 @@
 
       <!-- Right side -->
       <button
+        @click="openModalCreate = true"
         class="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-900 text-white text-sm hover:bg-gray-800 cursor-pointer"
       >
         <PlusIcon class="h-5 w-5" />
@@ -52,11 +53,14 @@
       />
     </div>
   </div>
+  <BaseModal :open="openModalCreate" @close-modal="openModalCreate = false">
+    <h1>Content</h1>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
-import { ProductCard } from '@/components/ui'
+import { BaseModal, ProductCard } from '@/components/ui'
 import { fetchCategories, fetchProducts } from '@/service'
 import { computed, ref } from 'vue'
 import { MagnifyGlassIcon, PlusIcon } from '@/assets/icons'
@@ -67,6 +71,7 @@ import { useDebounce } from '@/hooks'
 const search = ref('')
 const debouncedSearch = useDebounce(search, 500) // 300ms debounce
 const selectedCategory = ref('')
+const openModalCreate = ref(false)
 
 const { data: categoryData } = useQuery({
   queryKey: ['categories'],

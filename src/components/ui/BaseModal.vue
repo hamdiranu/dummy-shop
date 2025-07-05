@@ -2,22 +2,22 @@
   <transition name="fade">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      class="fixed inset-0 bg-black/80 flex justify-center items-center z-50"
+      @click.self="emit('close-modal', false)"
       @keydown.esc="emit('close-modal', false)"
     >
       <div
         ref="modalRef"
-        class="bg-white w-full rounded-lg shadow-lg relative overflow-y-auto"
+        class="bg-white w-full rounded-lg shadow-lg relative"
         :class="[widthClass, heightClass, 'p-6']"
         @click.stop
-        tabindex="0"
       >
         <!-- Close Button -->
         <button
           @click="emit('close-modal', false)"
-          class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
+          class="absolute top-6 right-6 text-gray-500 hover:text-gray-700 text-2xl cursor-pointer"
         >
-          &times;
+          <CrossIcon class="h-6 w-6" />
         </button>
 
         <!-- Modal Content -->
@@ -28,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+import { CrossIcon } from '@/assets/icons'
 import { ref } from 'vue'
 
 const props = defineProps<{
