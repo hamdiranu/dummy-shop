@@ -63,9 +63,8 @@
 import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { ProductCard } from '@/components/ui'
-import { fetchCategories, fetchProducts } from '@/service'
+import { fetchCategories, fetchProducts, fetchProductsByCategory } from '@/service'
 import { MagnifyGlassIcon } from '@/assets/icons'
-import api from '@/service/api'
 import type { IProduct } from '@/service/product/product.type'
 import { useDebounce } from '@/hooks'
 import { showSnackbar } from '@/utils'
@@ -86,15 +85,10 @@ const { data: categoryData } = useQuery({
 
 const categories = computed(() => categoryData.value || [])
 
-const fetchProductsByCategory = async (slug: string) => {
-  const { data } = await api.get(`https://dummyjson.com/products/category/${slug}`)
-  return data
-}
-
 const { data: productData, isFetching } = useQuery({
   queryKey: ['products', selectedCategory],
   queryFn: () =>
-    selectedCategory.value ? fetchProductsByCategory(selectedCategory.value) : fetchProducts(),
+    selectedCategory.value ? fetchProductsByCategory(selectedCategory.value) : fetchProducts(100),
 })
 
 const products = computed(() => {

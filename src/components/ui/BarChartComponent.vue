@@ -1,5 +1,5 @@
 <template>
-  <Bar :data="chartData" :options="chartOptions" />
+  <Bar :data="computedChartData" :options="computedOptions" />
 </template>
 
 <script setup lang="ts">
@@ -14,21 +14,31 @@ import {
   LinearScale,
   type ChartOptions,
 } from 'chart.js'
+import { computed } from 'vue'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
-const chartData = {
-  labels: ['beauty', 'fragrances', 'furniture', 'groceries'],
+// Props
+const props = defineProps<{
+  labels: string[]
+  data: number[]
+  datasetLabel?: string
+  backgroundColor?: string
+  options?: ChartOptions<'bar'>
+}>()
+
+const computedChartData = computed(() => ({
+  labels: props.labels,
   datasets: [
     {
-      label: 'Products',
-      data: [5, 5, 5, 15],
-      backgroundColor: '#8b5cf6',
+      label: props.datasetLabel ?? 'Dataset',
+      data: props.data,
+      backgroundColor: props.backgroundColor ?? '#8b5cf6',
     },
   ],
-}
+}))
 
-const chartOptions: ChartOptions<'bar'> = {
+const defaultOptions: ChartOptions<'bar'> = {
   responsive: true,
   animation: {
     duration: 800,
@@ -40,6 +50,11 @@ const chartOptions: ChartOptions<'bar'> = {
     },
   },
 }
+
+const computedOptions = computed(() => ({
+  ...defaultOptions,
+  ...props.options,
+}))
 </script>
 
 <style scoped>

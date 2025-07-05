@@ -1,6 +1,7 @@
 import api from './api'
 import type {
   AddProductPayload,
+  CartResponse,
   GetProductsResponse,
   LoginPayload,
   LoginResponse,
@@ -22,12 +23,18 @@ export const fetchCurrentUsers = async () => {
   return data
 }
 
-export const fetchProducts = async (): Promise<GetProductsResponse> => {
-  const { data } = await api.get('https://dummyjson.com/products?limit=100')
+export const fetchProducts = async (limit?: number): Promise<GetProductsResponse> => {
+  const url = `https://dummyjson.com/products${limit ? `?limit=${limit}` : ''}`
+  const { data } = await api.get(url)
   return data
 }
 
-export const fetchCarts = async () => {
+export const fetchProductsByCategory = async (slug: string) => {
+  const { data } = await api.get(`https://dummyjson.com/products/category/${slug}`)
+  return data
+}
+
+export const fetchCarts = async (): Promise<CartResponse> => {
   const { data } = await api.get('https://dummyjson.com/carts')
   return data
 }

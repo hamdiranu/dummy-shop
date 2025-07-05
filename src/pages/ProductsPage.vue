@@ -114,7 +114,7 @@ const {
 } = useQuery({
   queryKey: ['products', selectedCategory],
   queryFn: () =>
-    selectedCategory.value ? fetchProductsByCategory(selectedCategory.value) : fetchProducts(),
+    selectedCategory.value ? fetchProductsByCategory(selectedCategory.value) : fetchProducts(100),
 })
 
 const products = computed(() => {
