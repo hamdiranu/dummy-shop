@@ -49,7 +49,7 @@
           />
         </div>
 
-        <div class="flex gap-4">
+        <div v-if="!isEdit" class="flex gap-4">
           <BaseInput
             v-model="form.brand"
             label="Brand"
@@ -82,7 +82,7 @@
           <button
             type="submit"
             :disabled="isButtonLoading"
-            class="bg-gray-900 text-white px-4 py-2 hover:bg-gray-700 transition rounded-lg mt-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            class="bg-gray-900 text-white px-4 py-2 hover:bg-gray-700 transition rounded-lg mt-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
           >
             <CircularIcon v-if="isButtonLoading" class="h-5 w-5" />
             <span>{{ isEdit ? 'Update Product' : 'Add Product' }}</span>

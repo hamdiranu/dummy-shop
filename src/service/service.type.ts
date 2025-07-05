@@ -89,8 +89,8 @@ export interface IOrderSaved {
 export interface updateProductPayload {
   title: string
   description: string
-  price: string
-  stock: string
+  price: number
+  stock: number
 }
 
 export interface AddProductPayload extends updateProductPayload {

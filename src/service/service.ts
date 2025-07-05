@@ -17,6 +17,11 @@ export const fetchUsers = async () => {
   return data
 }
 
+export const fetchCurrentUsers = async () => {
+  const { data } = await api.get('https://dummyjson.com/users/me')
+  return data
+}
+
 export const fetchProducts = async (): Promise<GetProductsResponse> => {
   const { data } = await api.get('https://dummyjson.com/products?limit=100')
   return data

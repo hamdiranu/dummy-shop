@@ -8,6 +8,7 @@ import BaseInput from './BaseInput.vue'
 import OrderDetailModal from './OrderDetailModal.vue'
 import BaseModal from './BaseModal.vue'
 import ProductModal from './ProductModal.vue'
+import SpinnerComponent from './SpinnerComponent.vue'
 
 export {
   BarChartComponent,
@@ -20,4 +21,5 @@ export {
   OrderDetailModal,
   BaseModal,
   ProductModal,
+  SpinnerComponent,
 }

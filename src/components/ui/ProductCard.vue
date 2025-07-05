@@ -47,11 +47,13 @@
     <div v-if="type === 'detail'" class="flex items-center justify-between text-sm">
       <div class="flex gap-2 mt-2">
         <button
+          @click="emit('open-modal-edit')"
           class="px-3 py-2 border-[#e5e7eb] border-1 cursor-pointer rounded hover:bg-gray-100"
         >
           <EditIcon class="w-4 h-4" />
         </button>
         <button
+          @click="emit('delete-product')"
           class="px-3 py-2 border-[#e5e7eb] border-1 cursor-pointer rounded hover:bg-gray-100"
         >
           <TrashIcon class="w-4 h-4" />
@@ -93,6 +95,8 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: 'add-to-cart', product: IProduct): void
+  (e: 'open-modal-edit'): void
+  (e: 'delete-product'): void
 }>()
 </script>
 

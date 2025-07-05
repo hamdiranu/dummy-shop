@@ -8,7 +8,7 @@
 
       <button
         @click="handleCreate"
-        class="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-900 text-white text-sm hover:bg-gray-800"
+        class="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-900 text-white text-sm hover:bg-gray-800 cursor-pointer"
       >
         <PlusIcon class="h-5 w-5" />
         Add Product
@@ -44,17 +44,27 @@
         :product="product"
         :isLoading="isFetching"
         type="detail"
+        @open-modal-edit="
+          () => {
+            selectedProduct = product
+            openModalCreateEdit = true
+            isModalEdit = true
+          }
+        "
+        @delete-product="() => deleteMutation.mutate(product.id)"
       />
     </div>
   </div>
 
   <!-- Product Creation Modal -->
   <ProductModal
-    :open="openModalCreate"
-    :isEdit="false"
+    :open="openModalCreateEdit"
+    :isEdit="isModalEdit"
     :initialData="selectedProduct"
+    :isButtonLoading="createMutation.isPending.value || updateMutation.isPending.value"
     @on-add-data="saveProduct"
-    @close="openModalCreate = false"
+    @on-edit-data="editProduct"
+    @close="openModalCreateEdit = false"
   />
 </template>
 
@@ -63,11 +73,14 @@ import { useMutation, useQuery } from '@tanstack/vue-query'
 import { ref, computed } from 'vue'
 import { ProductCard, ProductModal } from '@/components/ui'
 import {
+  deleteProduct,
   fetchCategories,
   fetchProducts,
   postNewProduct,
+  updateProduct,
   type AddProductPayload,
   type GetProductsResponse,
+  type updateProductPayload,
 } from '@/service'
 import { MagnifyGlassIcon, PlusIcon } from '@/assets/icons'
 import type { IProduct } from '@/service/product/product.type'
@@ -78,7 +91,8 @@ import { showSnackbar } from '@/utils'
 const search = ref('')
 const debouncedSearch = useDebounce(search, 500)
 const selectedCategory = ref('')
-const openModalCreate = ref(false)
+const openModalCreateEdit = ref(false)
+const isModalEdit = ref(false)
 const selectedProduct = ref<IProduct | undefined>(undefined)
 
 const { data: categoryData } = useQuery({
@@ -117,11 +131,12 @@ const products = computed(() => {
 
 const handleCreate = () => {
   selectedProduct.value = undefined
-  openModalCreate.value = true
+  openModalCreateEdit.value = true
+  isModalEdit.value = false
 }
 
-// mutation
-const mutation = useMutation<AddProductPayload, unknown, AddProductPayload>({
+// create product mutation
+const createMutation = useMutation<AddProductPayload, unknown, AddProductPayload>({
   mutationFn: postNewProduct,
   onSuccess: async (data) => {
     showSnackbar('Success!!', `${data.title} has been added successfully!`)
@@ -134,7 +149,57 @@ const mutation = useMutation<AddProductPayload, unknown, AddProductPayload>({
 })
 
 const saveProduct = async (product: AddProductPayload) => {
-  mutation.mutate(product)
-  openModalCreate.value = false
+  createMutation.mutate(product)
+  openModalCreateEdit.value = false
+}
+
+// update product mutation
+const updateMutation = useMutation<updateProductPayload, unknown, updateProductPayload>({
+  mutationFn: (data) => updateProduct(selectedProduct.value!.id, data),
+  onSuccess: async (data) => {
+    showSnackbar('Success!!', `product ${data.title} has been added updated!`)
+    await refetch() // refresh product list after adding new product
+  },
+  onError: (err) => {
+    console.log(err)
+    showSnackbar('Error!!', `${err}`)
+  },
+})
+
+const deleteMutation = useMutation<
+  IProduct, // TData: expected return type of deleteProduct (assumed to be the deleted product)
+  unknown, // TError: error type
+  number // TVariables: the product ID passed to deleteProduct
+>({
+  mutationFn: (id) => deleteProduct(id),
+  onSuccess: async (data) => {
+    showSnackbar('Success!!', `Product "${data.title}" has been deleted!`)
+    await refetch()
+  },
+  onError: (err) => {
+    console.error(err)
+    showSnackbar('Error!!', err as string)
+  },
+})
+
+const editProduct = (product: IProduct) => {
+  if (!selectedProduct.value) {
+    console.error('No product selected for editing.')
+    return
+  }
+
+  const payload: updateProductPayload = {
+    title: product.title,
+    description: product.description,
+    price: product.price,
+    stock: product.stock,
+  }
+
+  updateMutation.mutate(payload, {
+    onSuccess: () => {
+      openModalCreateEdit.value = false
+      isModalEdit.value = false
+    },
+  })
 }
 </script>

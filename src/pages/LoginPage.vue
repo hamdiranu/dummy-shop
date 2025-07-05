@@ -93,19 +93,6 @@ const mutation = useMutation<LoginResponse, unknown, LoginPayload>({
     localStorage.setItem('authToken', data.accessToken)
     localStorage.setItem('refreshToken', data.refreshToken)
 
-    // Save user info (you can customize what to keep)
-    const userInfo = {
-      id: data.id,
-      username: data.username,
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      gender: data.gender,
-      image: data.image,
-    }
-
-    localStorage.setItem('user', JSON.stringify(userInfo))
-
     router.push('/dashboard')
   },
   onError: (err) => {
