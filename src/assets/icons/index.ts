@@ -16,6 +16,7 @@ import MagnifyGlassIcon from './magnify-glass.svg'
 import EyeIcon from './eye.svg'
 import DateIcon from './date.svg'
 import DollarIcon from './dollar.svg'
+import CrossIcon from './cross.svg'
 
 export {
   CartIcons,
@@ -36,4 +37,5 @@ export {
   EyeIcon,
   DateIcon,
   DollarIcon,
+  CrossIcon,
 }

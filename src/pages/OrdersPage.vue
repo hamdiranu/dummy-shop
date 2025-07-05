@@ -65,8 +65,7 @@
     </div>
   </div>
 
-  <!-- <OrderDetailModal v-if="selectedOrder" :order="selectedOrder" @close="selectedOrder = null" /> -->
-  <OrderDetailModal :order="orders[0]" @close="() => {}" />
+  <OrderDetailModal v-if="selectedOrder" :order="selectedOrder" @close="selectedOrder = null" />
 </template>
 
 <script setup lang="ts">

@@ -1,104 +1,86 @@
 <template>
-  <transition name="fade">
-    <div v-if="order" class="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+  <transition name="fade-modal">
+    <div
+      v-if="order"
+      class="fixed inset-0 bg-black/80 flex justify-center items-center z-50"
+      @click.self="emit('close')"
+    >
       <div
         ref="modalRef"
-        class="bg-white w-full max-w-[42rem] p-6 rounded-lg shadow-lg relative"
+        class="modal bg-white w-full max-w-[42rem] p-6 rounded-lg shadow-lg relative"
         @click.stop
       >
         <!-- Close Button -->
         <button
-          @click="$emit('close')"
-          class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+          @click="emit('close')"
+          class="absolute top-6 right-6 text-gray-500 hover:text-gray-700"
         >
-          ×
+          <CrossIcon class="w-6 h-6 cursor-pointer" />
         </button>
 
         <!-- Modal Title -->
-        <h2 class="text-xl font-bold mb-4">Order #{{ order.id }} Details</h2>
+        <div class="flex flex-col gap-0 mb-6">
+          <h2 class="text-lg font-semibold text-[#09090B]">Order #{{ order.id }} Details</h2>
+          <h2 class="text-sm font-normal text-[#71717A]">
+            Order placed on {{ new Date(order.date).toLocaleDateString() }}
+          </h2>
+        </div>
 
         <!-- Order Info -->
         <div class="grid grid-cols-2 mb-6">
           <div>
-            <p class="text-sm text-gray-500 mb-1">Order Status</p>
-            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-xl font-medium">
+            <p class="text-base font-base text-[#09090B] mb-1">Order Status</p>
+            <span
+              class="text-xs text-white bg-[#22C55E] hover:bg-[#27272f] px-3 py-1 rounded-xl font-semibold transition-colors"
+            >
               {{ order.status }}
             </span>
           </div>
           <div class="text-right">
-            <p class="text-sm text-gray-500 mb-1">Total Amount</p>
-            <p class="text-xl font-bold">${{ order.total.toFixed(2) }}</p>
+            <p class="text-base font-semibold text-[#09090B] mb-1">Total Amount</p>
+            <p class="text-2xl font-bold text-[#09090B]">
+              ${{
+                order.total.toLocaleString('id-ID', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              }}
+            </p>
           </div>
         </div>
 
         <!-- Items Ordered -->
         <div class="mb-6">
-          <p class="font-medium mb-3">Items Ordered</p>
+          <p class="font-semibold text-base text-[#09090B] mb-3">Items Ordered</p>
           <div class="overflow-y-auto max-h-[40vh] pr-2">
-            <ul class="divide-y divide-gray-200">
+            <ul class="flex flex-col gap-3">
               <li
                 v-for="item in order.items"
                 :key="item.id"
-                class="flex items-center justify-between py-3"
+                class="flex items-center justify-between p-3 border border-[#e5e7eb] rounded-lg"
               >
                 <div class="flex items-center gap-3">
-                  <img :src="item.thumbnail" class="w-12 h-12 object-cover rounded" />
+                  <img :src="item.thumbnail" class="w-16 h-16 object-cover rounded" />
                   <div>
-                    <p class="font-medium text-sm">{{ item.title }}</p>
-                    <p class="text-xs text-gray-500">
-                      Quantity: {{ item.quantity }} × ${{ item.price.toFixed(2) }}
+                    <p class="font-medium text-base text-[#09090B]">{{ item.title }}</p>
+                    <p class="font-normal text-sm text-[#71717A]">
+                      Quantity: {{ item.quantity }} × ${{
+                        item.price.toLocaleString('id-ID', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                      }}
                     </p>
                   </div>
                 </div>
-                <p class="text-sm font-semibold">${{ (item.quantity * item.price).toFixed(2) }}</p>
-              </li>
-              <li
-                v-for="item in order.items"
-                :key="item.id"
-                class="flex items-center justify-between py-3"
-              >
-                <div class="flex items-center gap-3">
-                  <img :src="item.thumbnail" class="w-12 h-12 object-cover rounded" />
-                  <div>
-                    <p class="font-medium text-sm">{{ item.title }}</p>
-                    <p class="text-xs text-gray-500">
-                      Quantity: {{ item.quantity }} × ${{ item.price.toFixed(2) }}
-                    </p>
-                  </div>
-                </div>
-                <p class="text-sm font-semibold">${{ (item.quantity * item.price).toFixed(2) }}</p>
-              </li>
-              <li
-                v-for="item in order.items"
-                :key="item.id"
-                class="flex items-center justify-between py-3"
-              >
-                <div class="flex items-center gap-3">
-                  <img :src="item.thumbnail" class="w-12 h-12 object-cover rounded" />
-                  <div>
-                    <p class="font-medium text-sm">{{ item.title }}</p>
-                    <p class="text-xs text-gray-500">
-                      Quantity: {{ item.quantity }} × ${{ item.price.toFixed(2) }}
-                    </p>
-                  </div>
-                </div>
-                <p class="text-sm font-semibold">${{ (item.quantity * item.price).toFixed(2) }}</p>
-              </li>
-              <li
-                v-for="item in order.items"
-                :key="item.id"
-                class="flex items-center justify-between py-3"
-              >
-                <div class="flex items-center gap-3">
-                  <img :src="item.thumbnail" class="w-12 h-12 object-cover rounded" />
-                  <div>
-                    <p class="font-medium text-sm">{{ item.title }}</p>
-                    <p class="text-xs text-gray-500">
-                      Quantity: {{ item.quantity }} × ${{ item.price.toFixed(2) }}
-                    </p>
-                  </div>
-                </div>
-                <p class="text-sm font-semibold">${{ (item.quantity * item.price).toFixed(2) }}</p>
+                <p class="text-base font-semibold text-[#09090B]">
+                  ${{
+                    (item.quantity * item.price).toLocaleString('id-ID', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  }}
+                </p>
               </li>
             </ul>
           </div>
@@ -106,13 +88,25 @@
 
         <!-- Shipping Information -->
         <div>
-          <p class="font-medium mb-3">Shipping Information</p>
-          <div class="bg-gray-50 p-4 rounded text-sm text-gray-800">
-            <p class="mb-1">{{ order.shippingInfo.firstName }} {{ order.shippingInfo.lastName }}</p>
-            <p class="mb-1">{{ order.shippingInfo.address }}</p>
-            <p class="mb-1">{{ order.shippingInfo.city }}</p>
-            <p class="text-xs text-gray-500">Email: {{ order.shippingInfo.email }}</p>
-            <p class="text-xs text-gray-500">Phone: {{ order.shippingInfo.phone }}</p>
+          <p class="font-semibold text-base text-[#09090B] mb-3">Shipping Information</p>
+          <div class="bg-[#F4F5F5] p-4 rounded gap-2 flex flex-col">
+            <div class="flex flex-col gap-0">
+              <p class="text-base font-medium text-[#09090B]">
+                {{ order.shippingInfo.firstName }} {{ order.shippingInfo.lastName }}
+              </p>
+              <p class="text-base font-normal text-[#09090B]">
+                {{ order.shippingInfo.address }}
+              </p>
+              <p class="text-base font-normal text-[#09090B]">{{ order.shippingInfo.city }}</p>
+            </div>
+            <div class="flex flex-col gap-0">
+              <p class="text-sm font-normal text-[#71717A]">
+                Email: {{ order.shippingInfo.email }}
+              </p>
+              <p class="text-sm font-normal text-[#71717A]">
+                Phone: {{ order.shippingInfo.phone }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -121,8 +115,9 @@
 </template>
 
 <script setup lang="ts">
+import { CrossIcon } from '@/assets/icons'
 import type { IOrderSaved } from '@/service'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { ref } from 'vue'
 
 defineProps<{
   order: IOrderSaved | null
@@ -130,24 +125,19 @@ defineProps<{
 
 const emit = defineEmits(['close'])
 const modalRef = ref<HTMLElement | null>(null)
-
-const handleClickOutside = (event: MouseEvent) => {
-  if (modalRef.value && !modalRef.value.contains(event.target as Node)) {
-    emit('close')
-  }
-}
-
-onMounted(() => document.addEventListener('click', handleClickOutside))
-onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
+.fade-modal-enter-active,
+.fade-modal-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
-.fade-enter-from,
-.fade-leave-to {
+
+.fade-modal-enter-from,
+.fade-modal-leave-to {
   opacity: 0;
+  transform: scale(0.95) translateY(10px);
 }
 </style>
