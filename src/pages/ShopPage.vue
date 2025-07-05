@@ -53,24 +53,31 @@
         :product="product"
         :isLoading="isFetching"
         type="shop"
+        @add-to-cart="handleAddToCart"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { ProductCard } from '@/components/ui'
 import { fetchCategories, fetchProducts } from '@/service'
-import { computed, ref } from 'vue'
 import { MagnifyGlassIcon } from '@/assets/icons'
 import api from '@/service/api'
 import type { IProduct } from '@/service/product/product.type'
 import { useDebounce } from '@/hooks'
+import { showSnackbar } from '@/utils'
+import { useCart } from '@/store' // ✅ New: use cart store
 
 const search = ref('')
-const debouncedSearch = useDebounce(search, 500) // 300ms debounce
+const debouncedSearch = useDebounce(search, 500)
 const selectedCategory = ref('')
+const selectedSort = ref('default')
+
+const { state, saveCart } = useCart() // ✅ cart state from store
+const cart = state.cart
 
 const { data: categoryData } = useQuery({
   queryKey: ['categories'],
@@ -90,21 +97,17 @@ const { data: productData, isFetching } = useQuery({
     selectedCategory.value ? fetchProductsByCategory(selectedCategory.value) : fetchProducts(),
 })
 
-const selectedSort = ref('default')
-
 const products = computed(() => {
-  const items = productData?.value?.products ?? []
+  const items: IProduct[] = productData?.value?.products ?? []
   const keyword = debouncedSearch.value.toLowerCase()
 
-  // Filter products
-  const filtered: IProduct[] = items.filter(
-    (product: IProduct) =>
+  const filtered = items.filter(
+    (product) =>
       product.title.toLowerCase().includes(keyword) ||
       product.description.toLowerCase().includes(keyword) ||
       product.category.toLowerCase().includes(keyword),
   )
 
-  // Sort products based on selectedSort
   switch (selectedSort.value) {
     case 'name-asc':
       filtered.sort((a, b) => a.title.localeCompare(b.title))
@@ -124,4 +127,23 @@ const products = computed(() => {
 
   return filtered
 })
+
+function handleAddToCart(product: IProduct) {
+  const index = cart.findIndex((item) => item.id === product.id)
+
+  if (index !== -1) {
+    cart[index].quantity += 1
+  } else {
+    cart.push({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      thumbnail: product.thumbnail,
+      quantity: 1,
+    })
+  }
+
+  saveCart()
+  showSnackbar('Added to cart', `${product.title} has been added to your cart`)
+}
 </script>

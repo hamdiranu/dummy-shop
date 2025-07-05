@@ -4,7 +4,7 @@
     id="drawer-navigation"
     :class="[
       ' bg-white border-r border-[0] border-[#e5e7eb] fixed z-40 min-h-screen h-screen flex flex-col justify-between transition-transform duration-300',
-      'w-[65%] md:w-[14%]', // 👈 Responsive width
+      'w-[65%] md:w-[14%]', // Responsive width
       props.isOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
     tabindex="-1"
@@ -27,11 +27,21 @@
           v-for="link in sidebarLinks"
           :key="link.name"
           :to="link.to"
-          class="flex items-center gap-2 py-2 px-3 rounded hover:bg-gray-100 transition-colors"
+          class="flex items-center justify-between py-2 px-3 rounded hover:bg-gray-100 transition-colors"
           active-class="bg-gray-100 font-medium"
         >
-          <component :is="link.icon" class="w-4 h-4" />
-          <span>{{ link.name }}</span>
+          <div class="flex items-center gap-2">
+            <component :is="link.icon" class="w-4 h-4" />
+            <span>{{ link.name }}</span>
+          </div>
+
+          <!-- Show badge only on Cart -->
+          <span
+            v-if="link.name === 'Cart' && cartQuantity > 0"
+            class="bg-[#2a2b30] text-white text-xs font-semibold px-2 py-0.5 rounded-full"
+          >
+            {{ cartQuantity }}
+          </span>
         </RouterLink>
       </nav>
     </div>
@@ -89,6 +99,7 @@ import {
   SignOutIcon,
 } from '@/assets/icons'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useCart } from '@/store'
 
 interface User {
   id: string
@@ -160,4 +171,11 @@ const handleSignOut = () => {
   localStorage.removeItem('user')
   router.push('/login')
 }
+
+const { cartQuantity, updateCartFromLocalStorage } = useCart()
+
+onMounted(() => {
+  updateCartFromLocalStorage()
+  window.addEventListener('storage', updateCartFromLocalStorage)
+})
 </script>

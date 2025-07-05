@@ -9,7 +9,7 @@
 
       <!-- Right side -->
       <button
-        class="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-900 text-white text-sm hover:bg-gray-800"
+        class="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-900 text-white text-sm hover:bg-gray-800 cursor-pointer"
       >
         <PlusIcon class="h-5 w-5" />
         Add Product

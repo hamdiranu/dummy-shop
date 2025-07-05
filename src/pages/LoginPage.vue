@@ -72,6 +72,7 @@ import { useRouter } from 'vue-router'
 import { AxiosError } from 'axios'
 import { useMutation } from '@tanstack/vue-query'
 import { loginUser, type LoginPayload, type LoginResponse } from '@/service'
+import { showSnackbar } from '@/utils'
 
 const router = useRouter()
 
@@ -87,7 +88,7 @@ const passwordError = ref(false)
 const mutation = useMutation<LoginResponse, unknown, LoginPayload>({
   mutationFn: loginUser,
   onSuccess: (data) => {
-    alert(`Login success!\nWelcomeback, ${data.firstName}!`)
+    showSnackbar('Login successful', `Welcome back, ${data.firstName}!`)
     // Save entire auth data to localStorage
     localStorage.setItem('authToken', data.accessToken)
     localStorage.setItem('refreshToken', data.refreshToken)

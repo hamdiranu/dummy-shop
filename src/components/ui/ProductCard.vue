@@ -61,6 +61,7 @@
     <div v-else class="flex items-center justify-between text-sm">
       <button
         class="w-full flex items-center justify-center gap-4 px-4 py-3 rounded-md cursor-pointer bg-[#2a2b30] hover:bg-[#3a3b40] transition-colors duration-200"
+        @click="emit('add-to-cart', product)"
       >
         <CartIcons class="w-5 h-5 text-white" />
         <span class="text-white">Add to Cart</span>
@@ -88,6 +89,10 @@ defineProps<{
   product: IProduct
   isLoading?: boolean
   type: 'detail' | 'shop'
+}>()
+
+const emit = defineEmits<{
+  (e: 'add-to-cart', product: IProduct): void
 }>()
 </script>
 

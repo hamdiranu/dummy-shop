@@ -33,3 +33,11 @@ export interface GetProductsResponse extends CommonGetResponse {
   skip: number
   limit: number
 }
+
+export interface ICartItem {
+  id: number
+  title: string
+  price: number
+  thumbnail: string
+  quantity: number
+}

@@ -15,6 +15,7 @@
       </main>
     </div>
   </div>
+  <SnackBar />
 </template>
 
 <script setup lang="ts">
@@ -22,6 +23,7 @@ import { ref } from 'vue'
 import { RouterView } from 'vue-router'
 import Sidebar from './SideBar.vue'
 import Navbar from './NavBar.vue'
+import { SnackBar } from '../ui'
 
 const isSidebarOpen = ref(true)
 </script>
