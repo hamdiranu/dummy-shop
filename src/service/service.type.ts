@@ -85,3 +85,15 @@ export interface IOrderSaved {
   items: Item[]
   shippingInfo: ShippingInfo
 }
+
+export interface updateProductPayload {
+  title: string
+  description: string
+  price: string
+  stock: string
+}
+
+export interface AddProductPayload extends updateProductPayload {
+  brand: string
+  category: string
+}

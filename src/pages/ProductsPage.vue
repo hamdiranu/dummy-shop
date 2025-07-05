@@ -1,16 +1,14 @@
 <template>
-  <div class="space-y-4 w-[100%]">
+  <div class="space-y-4 w-full">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-      <!-- Left side -->
       <div>
         <h1 class="text-3xl font-bold text-[#09090B]">Products</h1>
         <p class="text-md text-gray-500">Manage your product inventory</p>
       </div>
 
-      <!-- Right side -->
       <button
-        @click="openModalCreate = true"
-        class="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-900 text-white text-sm hover:bg-gray-800 cursor-pointer"
+        @click="handleCreate"
+        class="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-900 text-white text-sm hover:bg-gray-800"
       >
         <PlusIcon class="h-5 w-5" />
         Add Product
@@ -18,10 +16,8 @@
     </div>
 
     <div class="flex flex-col sm:flex-row gap-2">
-      <!-- Search Bar -->
       <div class="flex items-center flex-1 border-[#e5e7eb] border-1 rounded-md px-3 py-2 bg-white">
         <MagnifyGlassIcon class="h-5 w-5 text-gray-400 mr-2" />
-
         <input
           v-model="search"
           type="text"
@@ -30,7 +26,6 @@
         />
       </div>
 
-      <!-- Category Dropdown -->
       <select
         v-model="selectedCategory"
         class="text-sm border-[#e5e7eb] border-1 rounded-md px-3 py-2 bg-white w-full sm:w-[200px]"
@@ -43,7 +38,6 @@
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4">
-      <!-- Products -->
       <ProductCard
         v-for="product in products"
         :key="product.id"
@@ -53,25 +47,39 @@
       />
     </div>
   </div>
-  <BaseModal :open="openModalCreate" @close-modal="openModalCreate = false">
-    <h1>Content</h1>
-  </BaseModal>
+
+  <!-- Product Creation Modal -->
+  <ProductModal
+    :open="openModalCreate"
+    :isEdit="false"
+    :initialData="selectedProduct"
+    @on-add-data="saveProduct"
+    @close="openModalCreate = false"
+  />
 </template>
 
 <script setup lang="ts">
-import { useQuery } from '@tanstack/vue-query'
-import { BaseModal, ProductCard } from '@/components/ui'
-import { fetchCategories, fetchProducts } from '@/service'
-import { computed, ref } from 'vue'
+import { useMutation, useQuery } from '@tanstack/vue-query'
+import { ref, computed } from 'vue'
+import { ProductCard, ProductModal } from '@/components/ui'
+import {
+  fetchCategories,
+  fetchProducts,
+  postNewProduct,
+  type AddProductPayload,
+  type GetProductsResponse,
+} from '@/service'
 import { MagnifyGlassIcon, PlusIcon } from '@/assets/icons'
-import api from '@/service/api'
 import type { IProduct } from '@/service/product/product.type'
+import api from '@/service/api'
 import { useDebounce } from '@/hooks'
+import { showSnackbar } from '@/utils'
 
 const search = ref('')
-const debouncedSearch = useDebounce(search, 500) // 300ms debounce
+const debouncedSearch = useDebounce(search, 500)
 const selectedCategory = ref('')
 const openModalCreate = ref(false)
+const selectedProduct = ref<IProduct | undefined>(undefined)
 
 const { data: categoryData } = useQuery({
   queryKey: ['categories'],
@@ -80,12 +88,16 @@ const { data: categoryData } = useQuery({
 
 const categories = computed(() => categoryData.value || [])
 
-const fetchProductsByCategory = async (slug: string) => {
+const fetchProductsByCategory = async (slug: string): Promise<GetProductsResponse> => {
   const { data } = await api.get(`https://dummyjson.com/products/category/${slug}`)
   return data
 }
 
-const { data: productData, isFetching } = useQuery({
+const {
+  data: productData,
+  isFetching,
+  refetch,
+} = useQuery({
   queryKey: ['products', selectedCategory],
   queryFn: () =>
     selectedCategory.value ? fetchProductsByCategory(selectedCategory.value) : fetchProducts(),
@@ -102,4 +114,27 @@ const products = computed(() => {
       product.category.toLowerCase().includes(keyword),
   )
 })
+
+const handleCreate = () => {
+  selectedProduct.value = undefined
+  openModalCreate.value = true
+}
+
+// mutation
+const mutation = useMutation<AddProductPayload, unknown, AddProductPayload>({
+  mutationFn: postNewProduct,
+  onSuccess: async (data) => {
+    showSnackbar('Success!!', `${data.title} has been added successfully!`)
+    await refetch() // refresh product list after adding new product
+  },
+  onError: (err) => {
+    console.log(err)
+    showSnackbar('Error!!', `${err}`)
+  },
+})
+
+const saveProduct = async (product: AddProductPayload) => {
+  mutation.mutate(product)
+  openModalCreate.value = false
+}
 </script>

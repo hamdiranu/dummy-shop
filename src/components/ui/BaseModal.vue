@@ -8,8 +8,11 @@
     >
       <div
         ref="modalRef"
-        class="bg-white w-full rounded-lg shadow-lg relative"
-        :class="[widthClass, heightClass, 'p-6']"
+        class="bg-white rounded-lg shadow-lg relative p-6 w-full"
+        :style="{
+          maxWidth: props.maxWidth ?? '42rem',
+          maxHeight: props.maxHeight ?? '80vh',
+        }"
         @click.stop
       >
         <!-- Close Button -->
@@ -40,10 +43,6 @@ const props = defineProps<{
 const emit = defineEmits(['close-modal'])
 
 const modalRef = ref<HTMLElement | null>(null)
-
-// Classes for width and height from props
-const widthClass = props.maxWidth ?? 'max-w-[42rem]'
-const heightClass = props.maxHeight ?? 'max-h-[80vh]'
 </script>
 
 <style scoped>
