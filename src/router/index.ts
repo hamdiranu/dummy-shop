@@ -4,6 +4,7 @@ import { DashboardPage, ProductsPage, LoginPage, NotFoundPage } from '@/pages'
 import ShopPage from '@/pages/ShopPage.vue'
 import CartPage from '@/pages/CartPage.vue'
 import OrdersPage from '@/pages/OrdersPage.vue'
+import CheckoutPage from '@/pages/CheckoutPage.vue'
 
 const routes = [
   {
@@ -39,6 +40,12 @@ const routes = [
         path: 'orders',
         name: 'Orders',
         component: OrdersPage,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'checkout',
+        name: 'Checkout',
+        component: CheckoutPage,
         meta: { requiresAuth: true },
       },
     ],

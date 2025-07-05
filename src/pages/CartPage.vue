@@ -100,12 +100,14 @@
           </div>
 
           <button
-            class="w-full bg-[#2a2b30] text-white py-2 rounded cursor-pointer hover:bg-[#1f1f23] font-medium"
+            @click="router.push('/checkout')"
+            class="w-full flex items-center justify-center gap-4 px-4 py-3 rounded-md cursor-pointer bg-[#2a2b30] hover:bg-[#3a3b40] transition-colors duration-200 text-white font-medium"
           >
             Proceed to Checkout
           </button>
 
           <button
+            @click="router.push('/shop')"
             class="w-full border border-[#e5e7eb] py-2 rounded cursor-pointer hover:bg-gray-100 font-medium"
           >
             Continue Shopping
@@ -118,7 +120,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { SidebarTitle, TrashIcon } from '@/assets/icons'
 import { useCart } from '@/store'
 
@@ -129,6 +131,8 @@ interface CartItem {
   thumbnail: string
   quantity: number
 }
+
+const router = useRouter()
 
 // Use cart from reactive object (NOT ref)
 const { state, saveCart } = useCart()

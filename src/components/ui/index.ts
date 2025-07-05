@@ -4,5 +4,14 @@ import PieChartComponent from './PieChartComponent.vue'
 import DashboardCard from './DashboardCard.vue'
 import ProductCard from './ProductCard.vue'
 import SnackBar from './SnackBar.vue'
+import BaseInput from './BaseInput.vue'
 
-export { BarChartComponent, ChartCard, PieChartComponent, DashboardCard, ProductCard, SnackBar }
+export {
+  BarChartComponent,
+  ChartCard,
+  PieChartComponent,
+  DashboardCard,
+  ProductCard,
+  SnackBar,
+  BaseInput,
+}

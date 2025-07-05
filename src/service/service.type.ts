@@ -40,4 +40,5 @@ export interface ICartItem {
   price: number
   thumbnail: string
   quantity: number
+  discountPercentage?: number
 }
