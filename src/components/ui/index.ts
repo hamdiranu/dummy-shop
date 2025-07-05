@@ -5,6 +5,7 @@ import DashboardCard from './DashboardCard.vue'
 import ProductCard from './ProductCard.vue'
 import SnackBar from './SnackBar.vue'
 import BaseInput from './BaseInput.vue'
+import OrderDetailModal from './OrderDetailModal.vue'
 
 export {
   BarChartComponent,
@@ -14,4 +15,5 @@ export {
   ProductCard,
   SnackBar,
   BaseInput,
+  OrderDetailModal,
 }

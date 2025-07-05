@@ -42,3 +42,46 @@ export interface ICartItem {
   quantity: number
   discountPercentage?: number
 }
+
+export interface Product {
+  id: number
+  title: string
+  price: number
+  quantity: number
+  total: number
+  discountedPrice: number
+  thumbnail: string
+}
+
+export interface Item {
+  id: number
+  title: string
+  price: number
+  thumbnail: string
+  quantity: number
+}
+
+export interface ShippingInfo {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  address: string
+  city: string
+  state: string
+  zipCode: string
+}
+
+export interface IOrderSaved {
+  id: number
+  products: Product[]
+  total: number
+  discountedTotal: number
+  userId: number
+  totalProducts: number
+  totalQuantity: number
+  date: string
+  status: string
+  items: Item[]
+  shippingInfo: ShippingInfo
+}
