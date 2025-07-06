@@ -45,26 +45,48 @@
       </select>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-6">
-      <!-- Products -->
-      <ProductCard
-        v-for="product in products"
-        :key="product.id"
-        :product="product"
-        :isLoading="isFetching"
-        type="shop"
-        @add-to-cart="handleAddToCart"
-      />
+    <div v-if="products.length > 0">
+      <div
+        v-if="!isLoading"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-6"
+      >
+        <!-- Products -->
+        <ProductCard
+          v-for="product in products"
+          :key="product.id"
+          :product="product"
+          :isLoading="isFetching"
+          type="shop"
+          @add-to-cart="handleAddToCart"
+        />
+      </div>
+      <!-- Intersection Observer target -->
+      <div v-if="hasNextPage" class="h-10 w-full justify-center items-center flex">
+        <!-- wrapper div gets the ref, not the component -->
+        <div ref="loadMoreTrigger">
+          <SpinnerComponent class="p-8 h-25 w-25 m-auto" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div
+      v-else
+      class="flex flex-col items-center justify-center w-full py-12 text-center text-gray-500"
+    >
+      <EmptyBoxIcon class="w-64 h-64 mb-4" />
+      <p class="text-2xl font-semibold">No products found</p>
+      <p class="text-lg text-gray-400 mt-1">Try adjusting your search or filters</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useQuery } from '@tanstack/vue-query'
-import { ProductCard } from '@/components/ui'
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
+import { useInfiniteQuery, useQuery } from '@tanstack/vue-query'
+import { ProductCard, SpinnerComponent } from '@/components/ui'
 import { fetchCategories, fetchProducts, fetchProductsByCategory } from '@/service'
-import { MagnifyGlassIcon } from '@/assets/icons'
+import { EmptyBoxIcon, MagnifyGlassIcon } from '@/assets/icons'
 import type { IProduct } from '@/service/product/product.type'
 import { useDebounce } from '@/hooks'
 import { showSnackbar } from '@/utils'
@@ -80,27 +102,49 @@ const cart = state.cart
 
 const { data: categoryData } = useQuery({
   queryKey: ['categories'],
-  queryFn: fetchCategories,
+  queryFn: () => fetchCategories(),
 })
 
 const categories = computed(() => categoryData.value || [])
 
-const { data: productData, isFetching } = useQuery({
-  queryKey: ['products', selectedCategory],
-  queryFn: () =>
-    selectedCategory.value ? fetchProductsByCategory(selectedCategory.value) : fetchProducts(100),
+const {
+  data: productData,
+  fetchNextPage,
+  hasNextPage,
+  isLoading,
+  isFetchingNextPage,
+  isFetching,
+} = useInfiniteQuery({
+  queryKey: ['products', selectedCategory, debouncedSearch],
+  queryFn: ({ pageParam = 0 }) =>
+    selectedCategory.value
+      ? fetchProductsByCategory(selectedCategory.value, {
+          limit: 50,
+          skip: pageParam,
+        })
+      : fetchProducts({
+          limit: 50,
+          skip: pageParam,
+        }),
+
+  getNextPageParam: (lastPage, allPages) => {
+    const totalFetched = allPages.flatMap((p) => p.products).length
+    return totalFetched < lastPage.total ? totalFetched : undefined
+  },
+  initialPageParam: 0,
 })
 
 const products = computed(() => {
-  const items: IProduct[] = productData?.value?.products ?? []
   const keyword = debouncedSearch.value.toLowerCase()
+  const pages = productData.value?.pages ?? []
 
-  const filtered = items.filter(
-    (product) =>
-      product.title.toLowerCase().includes(keyword) ||
-      product.description.toLowerCase().includes(keyword) ||
-      product.category.toLowerCase().includes(keyword),
-  )
+  const filtered = pages
+    .flatMap((page) => page.products)
+    .filter(
+      (product: IProduct) =>
+        product.title.toLowerCase().includes(keyword) ||
+        product.description.toLowerCase().includes(keyword),
+    )
 
   switch (selectedSort.value) {
     case 'name-asc':
@@ -140,4 +184,48 @@ function handleAddToCart(product: IProduct) {
   saveCart()
   showSnackbar('Added to cart', `${product.title} has been added to your cart`)
 }
+
+const loadMoreTrigger = ref<HTMLElement | null>(null)
+
+let observer: IntersectionObserver | null = null
+
+const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+  const [entry] = entries
+  if (entry.isIntersecting && hasNextPage.value && !isFetchingNextPage.value) {
+    fetchNextPage()
+  }
+}
+
+onMounted(() => {
+  observer = new IntersectionObserver(handleIntersect, {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1, // more responsive
+  })
+
+  nextTick(() => {
+    if (loadMoreTrigger.value) {
+      observer!.observe(loadMoreTrigger.value)
+    }
+  })
+})
+
+onUnmounted(() => {
+  if (observer && loadMoreTrigger.value) {
+    observer.unobserve(loadMoreTrigger.value)
+  }
+  observer?.disconnect()
+})
+
+watch(
+  () => productData.value,
+  async () => {
+    await nextTick()
+    if (loadMoreTrigger.value && observer) {
+      observer.disconnect()
+      observer.observe(loadMoreTrigger.value)
+    }
+  },
+  { immediate: true },
+)
 </script>

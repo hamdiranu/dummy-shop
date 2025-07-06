@@ -1,60 +1,99 @@
+import removeEmptyValue from '@/utils/removeEmptyValue'
 import api from './api'
 import type {
   AddProductPayload,
   CartResponse,
   GetProductsResponse,
+  IGetlListRequest,
   LoginPayload,
   LoginResponse,
   updateProductPayload,
 } from './service.type'
 
 export const loginUser = async (payload: LoginPayload): Promise<LoginResponse> => {
-  const { data } = await api.post('https://dummyjson.com/auth/login', payload)
+  const { data } = await api({
+    method: 'POST',
+    url: `/auth/login`,
+    data: payload,
+  })
   return data
 }
 
-export const fetchUsers = async () => {
-  const { data } = await api.get('https://dummyjson.com/users')
+export const fetchUsers = async (params?: IGetlListRequest) => {
+  const { data } = await api({
+    method: 'GET',
+    url: `/users`,
+    params: removeEmptyValue(params || {}),
+  })
   return data
 }
 
 export const fetchCurrentUsers = async () => {
-  const { data } = await api.get('https://dummyjson.com/users/me')
+  const { data } = await api({
+    method: 'GET',
+    url: `/users/me`,
+  })
   return data
 }
 
-export const fetchProducts = async (limit?: number): Promise<GetProductsResponse> => {
-  const url = `https://dummyjson.com/products${limit ? `?limit=${limit}` : ''}`
-  const { data } = await api.get(url)
+export const fetchProducts = async (params?: IGetlListRequest): Promise<GetProductsResponse> => {
+  const { data } = await api({
+    method: 'GET',
+    url: `/products`,
+    params: removeEmptyValue(params || {}),
+  })
   return data
 }
 
-export const fetchProductsByCategory = async (slug: string) => {
-  const { data } = await api.get(`https://dummyjson.com/products/category/${slug}`)
+export const fetchProductsByCategory = async (slug: string, params?: IGetlListRequest) => {
+  const { data } = await api({
+    method: 'GET',
+    url: `/products/category/${slug}`,
+    params: removeEmptyValue(params || {}),
+  })
   return data
 }
 
-export const fetchCarts = async (): Promise<CartResponse> => {
-  const { data } = await api.get('https://dummyjson.com/carts')
+export const fetchCarts = async (params?: IGetlListRequest): Promise<CartResponse> => {
+  const { data } = await api({
+    method: 'GET',
+    url: `/carts`,
+    params: removeEmptyValue(params || {}),
+  })
   return data
 }
 
-export const fetchCategories = async () => {
-  const { data } = await api.get('https://dummyjson.com/products/categories')
+export const fetchCategories = async (params?: IGetlListRequest) => {
+  const { data } = await api({
+    method: 'GET',
+    url: `/products/categories`,
+    params: removeEmptyValue(params || {}),
+  })
   return data
 }
 
 export const postNewProduct = async (payload: AddProductPayload) => {
-  const { data } = await api.post('https://dummyjson.com/products/add', payload)
+  const { data } = await api({
+    method: 'POST',
+    url: `/products/add`,
+    data: payload,
+  })
   return data
 }
 
 export const updateProduct = async (id: number, payload: updateProductPayload) => {
-  const { data } = await api.put(`https://dummyjson.com/products/${id}`, payload)
+  const { data } = await api({
+    method: 'PUT',
+    url: `/products/${id}`,
+    data: payload,
+  })
   return data
 }
 
 export const deleteProduct = async (id: number) => {
-  const { data } = await api.delete(`https://dummyjson.com/products/${id}`)
+  const { data } = await api({
+    method: 'DELETE',
+    url: `/products/${id}`,
+  })
   return data
 }

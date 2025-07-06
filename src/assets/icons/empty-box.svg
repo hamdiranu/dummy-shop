@@ -1,0 +1,11 @@
+<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Box base -->
+  <path d="M50 100L100 130L150 100V150L100 180L50 150V100Z" fill="#BDBDBD"/>
+  <path d="M50 100L100 70L150 100L100 130L50 100Z" fill="#828282"/>
+  <path d="M50 100L100 130V180L50 150V100Z" fill="#E0E0E0"/>
+  
+  <!-- Circle with X -->
+  <circle cx="100" cy="60" r="30" fill="#F2F2F2"/>
+  <line x1="88" y1="48" x2="112" y2="72" stroke="#424242" stroke-width="4" stroke-linecap="round"/>
+  <line x1="112" y1="48" x2="88" y2="72" stroke="#424242" stroke-width="4" stroke-linecap="round"/>
+</svg>

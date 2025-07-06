@@ -134,7 +134,7 @@ const {
   isError,
 } = useQuery({
   queryKey: ['me-data'],
-  queryFn: fetchCurrentUsers,
+  queryFn: () => fetchCurrentUsers(),
   retry: false,
 })
 

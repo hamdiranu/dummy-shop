@@ -113,7 +113,7 @@ const emit = defineEmits(['close', 'on-add-data', 'on-edit-data'])
 
 const { data: categoryData } = useQuery({
   queryKey: ['categories'],
-  queryFn: fetchCategories,
+  queryFn: () => fetchCategories(),
 })
 
 const categories = computed(() => categoryData.value || [])

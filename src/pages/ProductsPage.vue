@@ -37,22 +37,43 @@
       </select>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4">
-      <ProductCard
-        v-for="product in products"
-        :key="product.id"
-        :product="product"
-        :isLoading="isFetching"
-        type="detail"
-        @open-modal-edit="
-          () => {
-            selectedProduct = product
-            openModalCreateEdit = true
-            isModalEdit = true
-          }
-        "
-        @delete-product="() => deleteMutation.mutate(product.id)"
-      />
+    <div v-if="products.length > 0">
+      <div
+        v-if="!isLoading"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4"
+      >
+        <ProductCard
+          v-for="product in products"
+          :key="product.id"
+          :product="product"
+          :isLoading="isFetching"
+          type="detail"
+          @open-modal-edit="
+            () => {
+              selectedProduct = product
+              openModalCreateEdit = true
+              isModalEdit = true
+            }
+          "
+          @delete-product="() => deleteMutation.mutate(product.id)"
+        />
+      </div>
+      <!-- Intersection Observer target -->
+      <div v-if="hasNextPage" class="h-10 w-full justify-center items-center flex">
+        <!-- wrapper div gets the ref, not the component -->
+        <div ref="loadMoreTrigger">
+          <SpinnerComponent class="p-8 h-25 w-25 m-auto" />
+        </div>
+      </div>
+    </div>
+    <!-- Empty State -->
+    <div
+      v-else
+      class="flex flex-col items-center justify-center w-full py-12 text-center text-gray-500"
+    >
+      <EmptyBoxIcon class="w-64 h-64 mb-4" />
+      <p class="text-2xl font-semibold">No products found</p>
+      <p class="text-lg text-gray-400 mt-1">Try adjusting your search or filters</p>
     </div>
   </div>
 
@@ -69,22 +90,21 @@
 </template>
 
 <script setup lang="ts">
-import { useMutation, useQuery } from '@tanstack/vue-query'
-import { ref, computed } from 'vue'
-import { ProductCard, ProductModal } from '@/components/ui'
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/vue-query'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ProductCard, ProductModal, SpinnerComponent } from '@/components/ui'
 import {
   deleteProduct,
   fetchCategories,
   fetchProducts,
+  fetchProductsByCategory,
   postNewProduct,
   updateProduct,
   type AddProductPayload,
-  type GetProductsResponse,
   type updateProductPayload,
 } from '@/service'
-import { MagnifyGlassIcon, PlusIcon } from '@/assets/icons'
+import { EmptyBoxIcon, MagnifyGlassIcon, PlusIcon } from '@/assets/icons'
 import type { IProduct } from '@/service/product/product.type'
-import api from '@/service/api'
 import { useDebounce } from '@/hooks'
 import { showSnackbar } from '@/utils'
 
@@ -97,36 +117,50 @@ const selectedProduct = ref<IProduct | undefined>(undefined)
 
 const { data: categoryData } = useQuery({
   queryKey: ['categories'],
-  queryFn: fetchCategories,
+  queryFn: () => fetchCategories(),
 })
 
 const categories = computed(() => categoryData.value || [])
 
-const fetchProductsByCategory = async (slug: string): Promise<GetProductsResponse> => {
-  const { data } = await api.get(`https://dummyjson.com/products/category/${slug}`)
-  return data
-}
-
 const {
   data: productData,
+  fetchNextPage,
+  hasNextPage,
+  isLoading,
+  isFetchingNextPage,
   isFetching,
   refetch,
-} = useQuery({
-  queryKey: ['products', selectedCategory],
-  queryFn: () =>
-    selectedCategory.value ? fetchProductsByCategory(selectedCategory.value) : fetchProducts(100),
+} = useInfiniteQuery({
+  queryKey: ['products', selectedCategory, debouncedSearch],
+  queryFn: ({ pageParam = 0 }) =>
+    selectedCategory.value
+      ? fetchProductsByCategory(selectedCategory.value, {
+          limit: 50,
+          skip: pageParam,
+        })
+      : fetchProducts({
+          limit: 50,
+          skip: pageParam,
+        }),
+
+  getNextPageParam: (lastPage, allPages) => {
+    const totalFetched = allPages.flatMap((p) => p.products).length
+    return totalFetched < lastPage.total ? totalFetched : undefined
+  },
+  initialPageParam: 0,
 })
 
 const products = computed(() => {
-  const items = productData?.value?.products ?? []
   const keyword = debouncedSearch.value.toLowerCase()
+  const pages = productData.value?.pages ?? []
 
-  return items.filter(
-    (product: IProduct) =>
-      product.title.toLowerCase().includes(keyword) ||
-      product.description.toLowerCase().includes(keyword) ||
-      product.category.toLowerCase().includes(keyword),
-  )
+  return pages
+    .flatMap((page) => page.products)
+    .filter(
+      (product: IProduct) =>
+        product.title.toLowerCase().includes(keyword) ||
+        product.description.toLowerCase().includes(keyword),
+    )
 })
 
 const handleCreate = () => {
@@ -202,4 +236,48 @@ const editProduct = (product: IProduct) => {
     },
   })
 }
+
+const loadMoreTrigger = ref<HTMLElement | null>(null)
+
+let observer: IntersectionObserver | null = null
+
+const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+  const [entry] = entries
+  if (entry.isIntersecting && hasNextPage.value && !isFetchingNextPage.value) {
+    fetchNextPage()
+  }
+}
+
+onMounted(() => {
+  observer = new IntersectionObserver(handleIntersect, {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1, // more responsive
+  })
+
+  nextTick(() => {
+    if (loadMoreTrigger.value) {
+      observer!.observe(loadMoreTrigger.value)
+    }
+  })
+})
+
+onUnmounted(() => {
+  if (observer && loadMoreTrigger.value) {
+    observer.unobserve(loadMoreTrigger.value)
+  }
+  observer?.disconnect()
+})
+
+watch(
+  () => productData.value,
+  async () => {
+    await nextTick()
+    if (loadMoreTrigger.value && observer) {
+      observer.disconnect()
+      observer.observe(loadMoreTrigger.value)
+    }
+  },
+  { immediate: true },
+)
 </script>
