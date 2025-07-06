@@ -32,9 +32,7 @@ function isAuthenticated() {
 
 function redirectNow() {
   if (interval) clearInterval(interval)
-  if (!cancelled.value) {
-    router.push({ name: isAuthenticated() ? 'Dashboard' : 'Login' })
-  }
+  router.push({ name: isAuthenticated() ? 'Dashboard' : 'Login' })
 }
 
 function cancelRedirect() {
