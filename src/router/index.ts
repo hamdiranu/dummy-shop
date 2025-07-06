@@ -60,6 +60,7 @@ const routes = [
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: NotFoundPage,
+    meta: { requiresAuth: false },
   },
 ]
 
