@@ -1,22 +1,102 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4">
-    <h1 class="text-6xl font-bold text-gray-800">404</h1>
-    <p class="text-xl text-gray-600 mt-4">Oops! Page not found.</p>
-    <button
-      @click="goBack"
-      class="mt-6 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md cursor-pointer"
-    >
-      Go Back
-    </button>
+  <div class="not-found-page">
+    <h1>404 - Page Not Found</h1>
+    <p>Redirecting in {{ countdown }} second<span v-if="countdown !== 1">s</span>...</p>
+
+    <div class="progress-container">
+      <div class="progress-bar" :style="{ width: progress + '%' }"></div>
+    </div>
+
+    <div class="button-group">
+      <button @click="redirectNow">Go Now</button>
+      <button @click="cancelRedirect">Cancel</button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const goBack = () => {
-  router.back()
+const countdown = ref(5)
+const totalTime = countdown.value
+const progress = ref(100)
+let interval: ReturnType<typeof setInterval> | null = null
+const cancelled = ref(false)
+
+function isAuthenticated() {
+  return !!localStorage.getItem('authToken')
 }
+
+function redirectNow() {
+  if (interval) clearInterval(interval)
+  if (!cancelled.value) {
+    router.push({ name: isAuthenticated() ? 'Dashboard' : 'Login' })
+  }
+}
+
+function cancelRedirect() {
+  if (interval) clearInterval(interval)
+  cancelled.value = true
+}
+
+onMounted(() => {
+  interval = setInterval(() => {
+    countdown.value--
+    progress.value = (countdown.value / totalTime) * 100
+
+    if (countdown.value <= 0) {
+      redirectNow()
+    }
+  }, 1000)
+})
 </script>
+
+<style scoped>
+.not-found-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full vertical height */
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.progress-container {
+  width: 300px;
+  height: 10px;
+  background: #eee;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #000; /* Changed to black */
+  transition: width 1s linear;
+}
+
+.button-group {
+  margin-top: 20px;
+}
+
+button {
+  margin: 0 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  background-color: #000; /* Changed to black */
+  color: white;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #333;
+}
+</style>
