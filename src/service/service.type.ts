@@ -125,3 +125,8 @@ export interface CartResponse {
   skip: number
   limit: number
 }
+
+export interface IGetlListRequest {
+  limit?: number
+  skip?: number
+}

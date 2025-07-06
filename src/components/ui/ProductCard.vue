@@ -1,19 +1,30 @@
 <template>
   <div
     v-if="!isLoading"
+    ref="rootEl"
     :class="[
       'bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col gap-2 relative transition-shadow duration-300',
       type === 'shop' && 'group hover:shadow-lg',
     ]"
   >
     <img
+      v-if="!imageError"
       :src="product.thumbnail"
       alt="Product Image"
+      @load="imageLoaded = true"
+      @error="handleImageError"
       :class="[
-        'w-full h-[50vdh] object-contain mb-4 transition-transform duration-300',
+        'w-full h-[50vh] object-contain mb-4 transition-transform duration-300',
         type === 'shop' && 'group-hover:scale-105',
+        imageLoaded ? 'opacity-100 transition-opacity duration-500' : 'opacity-0',
+        !imageLoaded && 'opacity-0',
       ]"
     />
+
+    <!-- fallback skeleton or retry -->
+    <div v-else class="w-full h-[50vh] flex items-center justify-center bg-gray-100 rounded mb-4">
+      <span class="text-gray-500 text-sm">Image failed to load. Retrying...</span>
+    </div>
     <div
       v-if="type === 'shop' && product.discountPercentage > 0"
       class="absolute top-7 left-9 bg-red-500 text-white text-xs font-semibold px-3.5 py-1 rounded-full"
@@ -86,6 +97,7 @@
 <script setup lang="ts">
 import { CartIcons, EditIcon, TrashIcon } from '@/assets/icons'
 import type { IProduct } from '@/service/product/product.type'
+import { ref } from 'vue'
 
 defineProps<{
   product: IProduct
@@ -98,6 +110,22 @@ const emit = defineEmits<{
   (e: 'open-modal-edit'): void
   (e: 'delete-product'): void
 }>()
+
+const rootEl = ref<HTMLElement | null>(null)
+defineExpose({ rootEl }) // 👈 expose the element
+
+const imageLoaded = ref(false)
+const imageError = ref(false)
+
+const handleImageError = () => {
+  imageError.value = true
+
+  // Retry after delay (e.g., 2.5s)
+  setTimeout(() => {
+    imageError.value = false
+    imageLoaded.value = false
+  }, 2500)
+}
 </script>
 
 <style scoped>

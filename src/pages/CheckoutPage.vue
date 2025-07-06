@@ -116,10 +116,9 @@ import { useQuery } from '@tanstack/vue-query'
 import useVuelidate from '@vuelidate/core'
 import { required, email, numeric, minLength, helpers } from '@vuelidate/validators'
 import { useCart } from '@/store'
-import type { ICartItem } from '@/service'
+import { fetchCurrentUsers, type ICartItem } from '@/service'
 import { BaseInput } from '@/components/ui'
 import { showSnackbar } from '@/utils'
-import api from '@/service/api'
 import { useRouter } from 'vue-router'
 
 const { state: cartState, saveCart } = useCart()
@@ -244,10 +243,7 @@ const v$ = useVuelidate(rules, { form, payment })
 
 const { data: userData } = useQuery({
   queryKey: ['user'],
-  queryFn: async () => {
-    const res = await api.get('https://dummyjson.com/user/me')
-    return res.data
-  },
+  queryFn: () => fetchCurrentUsers(),
 })
 
 watchEffect(() => {

@@ -67,7 +67,7 @@ const barChartData = ref<number[]>([])
 const { data: productData, isFetching: isFetchingProducts } = useQuery({
   queryKey: ['all-products'],
   queryFn: async () => {
-    const response = await fetchProducts(100)
+    const response = await fetchProducts({ limit: 100 })
 
     if (response?.products?.length) {
       const categoryMap = new Map<string, number>()
@@ -86,12 +86,12 @@ const { data: productData, isFetching: isFetchingProducts } = useQuery({
 
 const { data: userData, isFetching: isFetchingUsers } = useQuery({
   queryKey: ['users'],
-  queryFn: fetchUsers,
+  queryFn: () => fetchUsers(),
 })
 
 const { data: cartData, isFetching: isFetchingCarts } = useQuery({
   queryKey: ['carts'],
-  queryFn: fetchCarts,
+  queryFn: () => fetchCarts(),
 })
 
 const formattedRevenue = computed(() => {

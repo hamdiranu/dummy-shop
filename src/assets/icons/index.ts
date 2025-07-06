@@ -18,6 +18,7 @@ import DateIcon from './date.svg'
 import DollarIcon from './dollar.svg'
 import CrossIcon from './cross.svg'
 import CircularIcon from './circular.svg'
+import EmptyBoxIcon from './empty-box.svg'
 
 export {
   CartIcons,
@@ -40,4 +41,5 @@ export {
   DollarIcon,
   CrossIcon,
   CircularIcon,
+  EmptyBoxIcon,
 }
