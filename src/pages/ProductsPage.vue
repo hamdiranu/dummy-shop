@@ -37,6 +37,11 @@
       </select>
     </div>
 
+    <!-- Loading GIF -->
+    <div v-if="isFetching" class="flex justify-center items-center w-full py-20">
+      <img src="@/assets/icons/loading_gif.gif" alt="Loading" class="w-auto h-[45vh]" />
+    </div>
+
     <div v-if="products.length > 0">
       <div
         v-if="!isLoading"
@@ -68,7 +73,7 @@
     </div>
     <!-- Empty State -->
     <div
-      v-else
+      v-if="products.length == 0 && !isFetching"
       class="flex flex-col items-center justify-center w-full py-12 text-center text-gray-500"
     >
       <EmptyBoxIcon class="w-64 h-64 mb-4" />

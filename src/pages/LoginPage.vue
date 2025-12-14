@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-50">
-    <div class="bg-white p-8 m-6 rounded shadow-md w-full max-w-md">
+    <div class="bg-white p-8 m-6 rounded-2xl shadow-md w-full max-w-md">
       <h2 class="text-2xl font-bold text-center mb-2">Sign in</h2>
       <p class="text-center text-sm text-gray-500 mb-6">
         Enter your credentials to access the e-commerce dashboard

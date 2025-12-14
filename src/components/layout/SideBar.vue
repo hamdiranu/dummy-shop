@@ -64,7 +64,7 @@
       <div class="relative px-4 py-4 text-xs" ref="dropdownRef">
         <button
           @click="toggleDropdown"
-          class="flex items-center gap-2 w-full text-left hover:bg-gray-100 p-2 rounded"
+          class="flex items-center gap-2 w-full text-left hover:bg-gray-100 p-2 rounded cursor-pointer"
         >
           <img :src="user.image" alt="User avatar" class="w-6 h-6 rounded-full" />
           <span class="text-gray-700 truncate">{{ user.fullName }}</span>
