@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[40dvh] flex items-center justify-center">
+  <div class="flex h-[40dvh] items-center justify-center">
     <Pie :data="chartData" :options="chartOptions" />
   </div>
 </template>
@@ -10,6 +10,8 @@ import { type ChartOptions, Chart as ChartJS, Title, Tooltip, Legend, ArcElement
 import type { ChartData } from 'chart.js'
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement)
+ChartJS.defaults.font.family = "'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif"
+ChartJS.defaults.color = '#64748b'
 
 defineProps<{
   chartData: ChartData<'pie'>

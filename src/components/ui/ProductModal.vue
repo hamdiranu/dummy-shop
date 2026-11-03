@@ -1,13 +1,20 @@
 <template>
-  <BaseModal :open="open" @close-modal="emit('close')" maxWidth="32rem">
+  <BaseModal :open="open" @close-modal="emit('close')" maxWidth="34rem">
     <div class="space-y-6">
-      <div>
-        <h2 class="text-lg font-semibold">
-          {{ isEdit ? 'Edit Product' : 'Add New Product' }}
-        </h2>
-        <p class="text-sm text-gray-500">
-          {{ isEdit ? 'Update product information' : 'Create a new product for your store' }}
-        </p>
+      <div class="flex items-start gap-4 pr-10">
+        <span
+          class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100"
+        >
+          <component :is="isEdit ? EditIcon : PlusIcon" class="h-5 w-5" />
+        </span>
+        <div>
+          <h2 class="text-lg font-semibold text-slate-900">
+            {{ isEdit ? 'Edit Product' : 'Add New Product' }}
+          </h2>
+          <p class="text-sm text-slate-500">
+            {{ isEdit ? 'Update product information' : 'Create a new product for your store' }}
+          </p>
+        </div>
       </div>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
@@ -59,14 +66,13 @@
             :error="!!errors.brand"
             :errorMessage="errors.brand"
           />
-          <div class="gap-2 flex flex-col w-[48%]">
-            <label class="text-sm font-medium">Category <span class="text-red-500">*</span></label>
+          <div class="flex flex-1 flex-col gap-1.5">
+            <label class="text-sm font-medium text-slate-700"
+              >Category <span class="text-rose-500">*</span></label
+            >
             <select
               v-model="form.category"
-              :class="[
-                'text-sm border rounded-md px-3 py-2 bg-white w-full input',
-                errors.category ? 'border-red-500' : 'border-[#e5e7eb]',
-              ]"
+              :class="['select', errors.category && 'input-error']"
               required
             >
               <option value="">All Categories</option>
@@ -74,16 +80,15 @@
                 {{ category.name }}
               </option>
             </select>
-            <p v-if="errors.category" class="text-red-500 text-xs mt-1">{{ errors.category }}</p>
+            <p v-if="errors.category" class="text-xs font-medium text-rose-500">
+              {{ errors.category }}
+            </p>
           </div>
         </div>
 
-        <div class="flex justify-end mt-4">
-          <button
-            type="submit"
-            :disabled="isButtonLoading"
-            class="bg-gray-900 text-white px-4 py-2 hover:bg-gray-700 transition rounded-lg mt-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-          >
+        <div class="flex justify-end gap-2 border-t border-slate-100 pt-5">
+          <button type="button" class="btn-secondary" @click="emit('close')">Cancel</button>
+          <button type="submit" :disabled="isButtonLoading" class="btn-primary">
             <CircularIcon v-if="isButtonLoading" class="h-5 w-5" />
             <span>{{ isEdit ? 'Update Product' : 'Add Product' }}</span>
           </button>
@@ -100,7 +105,7 @@ import BaseInput from './BaseInput.vue'
 import { computed, reactive, watch } from 'vue'
 import { fetchCategories } from '@/service'
 import type { IProduct } from '@/service/product/product.type'
-import { CircularIcon } from '@/assets/icons'
+import { CircularIcon, EditIcon, PlusIcon } from '@/assets/icons'
 
 const props = defineProps<{
   open: boolean

@@ -1,26 +1,27 @@
 <template>
-  <transition name="fade">
+  <transition name="modal">
     <div
       v-if="open"
-      class="fixed inset-0 bg-black/80 flex justify-center items-center z-50"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
       @click.self="emit('close-modal', false)"
       @keydown.esc="emit('close-modal', false)"
     >
       <div
         ref="modalRef"
-        class="bg-white rounded-lg shadow-lg relative p-6 w-full"
+        class="modal-panel scroll-thin relative w-full overflow-y-auto rounded-3xl border border-slate-200/60 bg-white p-6 shadow-2xl sm:p-7"
         :style="{
           maxWidth: props.maxWidth ?? '42rem',
-          maxHeight: props.maxHeight ?? '80vh',
+          maxHeight: props.maxHeight ?? '85vh',
         }"
         @click.stop
       >
         <!-- Close Button -->
         <button
           @click="emit('close-modal', false)"
-          class="absolute top-6 right-6 text-gray-500 hover:text-gray-700 text-2xl cursor-pointer"
+          class="absolute top-5 right-5 grid h-9 w-9 place-items-center rounded-xl text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+          aria-label="Close"
         >
-          <CrossIcon class="h-6 w-6" />
+          <CrossIcon class="h-5 w-5" />
         </button>
 
         <!-- Modal Content -->
@@ -46,12 +47,20 @@ const modalRef = ref<HTMLElement | null>(null)
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
+.modal-enter-active,
+.modal-leave-active {
   transition: opacity 0.2s ease;
 }
-.fade-enter-from,
-.fade-leave-to {
+.modal-enter-active .modal-panel,
+.modal-leave-active .modal-panel {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.modal-enter-from,
+.modal-leave-to {
   opacity: 0;
+}
+.modal-enter-from .modal-panel,
+.modal-leave-to .modal-panel {
+  transform: translateY(12px) scale(0.97);
 }
 </style>

@@ -1,31 +1,29 @@
 <template>
-  <div class="space-y-4 w-[100%] gap-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+  <div class="w-full">
+    <div class="page-header">
       <!-- Left side -->
       <div>
-        <h1 class="text-3xl font-bold text-[#09090B]">Shop</h1>
-        <p class="text-md text-[#71717a]">Browse and purchase products</p>
+        <h1 class="page-title">Shop</h1>
+        <p class="page-subtitle">Browse and purchase products</p>
       </div>
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-4 mb-6">
+    <div class="card mb-6 flex flex-col gap-3 p-3 sm:flex-row">
       <!-- Search Bar -->
-      <div class="flex items-center flex-1 border-[#e5e7eb] border-1 rounded-md px-3 py-2 bg-white">
-        <MagnifyGlassIcon class="h-5 w-5 text-gray-400 mr-2" />
-
+      <div class="relative flex-1">
+        <MagnifyGlassIcon
+          class="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-slate-400"
+        />
         <input
           v-model="search"
           type="text"
           placeholder="Search products..."
-          class="w-full text-sm outline-none text-gray-700"
+          class="input pl-10 shadow-none"
         />
       </div>
 
       <!-- Category Dropdown -->
-      <select
-        v-model="selectedCategory"
-        class="text-sm border-[#e5e7eb] border-1 rounded-md px-3 py-2 bg-white w-full sm:w-[200px]"
-      >
+      <select v-model="selectedCategory" class="select shadow-none sm:w-[200px]">
         <option value="">All Categories</option>
         <option v-for="category in categories" :key="category.slug" :value="category.slug">
           {{ category.name }}
@@ -33,10 +31,7 @@
       </select>
 
       <!-- Sort Dropdown -->
-      <select
-        v-model="selectedSort"
-        class="text-sm border-[#e5e7eb] border-1 rounded-md px-3 py-2 bg-white w-full sm:w-[200px]"
-      >
+      <select v-model="selectedSort" class="select shadow-none sm:w-[200px]">
         <option value="default">Default</option>
         <option value="name-asc">Name A-Z</option>
         <option value="price-asc">Price: Low to High</option>
@@ -46,14 +41,14 @@
     </div>
 
     <!-- Loading GIF -->
-    <div v-if="isFetching" class="flex justify-center items-center w-full py-20">
-      <img src="@/assets/icons/loading_gif.gif" alt="Loading" class="w-auto h-[45vh]" />
+    <div v-if="isFetching" class="flex w-full items-center justify-center py-16">
+      <img src="@/assets/icons/loading_gif.gif" alt="Loading" class="h-[40vh] w-auto" />
     </div>
 
     <div v-if="products.length > 0">
       <div
         v-if="!isLoading"
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-6"
+        class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
       >
         <!-- Products -->
         <ProductCard
@@ -66,22 +61,19 @@
         />
       </div>
       <!-- Intersection Observer target -->
-      <div v-if="hasNextPage" class="h-10 w-full justify-center items-center flex">
+      <div v-if="hasNextPage" class="flex h-10 w-full items-center justify-center">
         <!-- wrapper div gets the ref, not the component -->
         <div ref="loadMoreTrigger">
-          <SpinnerComponent class="p-8 h-25 w-25 m-auto" />
+          <SpinnerComponent class="m-auto h-25 w-25 p-8" />
         </div>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div
-      v-if="products.length == 0 && !isFetching"
-      class="flex flex-col items-center justify-center w-full py-12 text-center text-gray-500"
-    >
-      <EmptyBoxIcon class="w-64 h-64 mb-4" />
-      <p class="text-2xl font-semibold">No products found</p>
-      <p class="text-lg text-gray-400 mt-1">Try adjusting your search or filters</p>
+    <div v-if="products.length == 0 && !isFetching" class="empty-state">
+      <EmptyBoxIcon class="mb-4 h-32 w-32" />
+      <p class="text-lg font-semibold text-slate-900">No products found</p>
+      <p class="mt-1 text-sm text-slate-500">Try adjusting your search or filters</p>
     </div>
   </div>
 </template>

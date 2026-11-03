@@ -3,97 +3,155 @@
   <aside
     id="drawer-navigation"
     :class="[
-      'bg-white border-r border-[0] border-[#e5e7eb] fixed z-40 min-h-screen h-screen flex flex-col justify-between transition-transform duration-300',
-      'w-[65%] md:w-[14%]',
+      'fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200/70 bg-white transition-transform duration-300 ease-out',
       props.isOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
     tabindex="-1"
     aria-labelledby="drawer-navigation-label"
   >
-    <!-- Loading Skeleton -->
-    <div
-      v-if="isLoading"
-      class="p-4 space-y-4 flex flex-col m-auto items-center gap-2 text-gray-500"
-    >
-      <SpinnerComponent class="h-16 w-16" />
-      <span>Loading user info...</span>
-    </div>
-
-    <!-- Error Fallback -->
-    <div v-else-if="isError" class="p-4 text-sm text-red-500">
-      Failed to load user data. Please try again later.
-    </div>
-
-    <!-- Normal Sidebar Content -->
-    <template v-else>
-      <!-- Top Section -->
-      <div :class="[props.isOpen ? '' : 'hidden', 'transition-transform duration-300']">
-        <!-- Brand -->
-        <div class="p-4 font-semibold text-base flex items-center gap-2">
-          <SidebarTitle class="w-4 h-4" />
+    <!-- Brand -->
+    <div class="flex h-16 shrink-0 items-center gap-3 px-5">
+      <div
+        class="grid h-9 w-9 place-items-center rounded-xl bg-linear-to-br from-brand-500 to-violet-600 text-white shadow-glow"
+      >
+        <SidebarTitle class="h-5 w-5" />
+      </div>
+      <div class="leading-tight">
+        <p id="drawer-navigation-label" class="text-sm font-bold text-slate-900">
           DummyJSON Store
-        </div>
+        </p>
+        <p class="text-xs text-slate-400">Commerce console</p>
+      </div>
+    </div>
 
-        <!-- Navigation Title -->
-        <div class="text-xs text-gray-500 px-4 pt-4 uppercase tracking-wide">Navigation</div>
-
-        <!-- Navigation Links -->
-        <nav class="mt-2 px-2 text-sm text-gray-700 space-y-1">
-          <RouterLink
-            v-for="link in sidebarLinks"
-            :key="link.name"
-            :to="link.to"
-            class="flex items-center justify-between py-2 px-3 rounded hover:bg-gray-100 transition-colors"
-            active-class="bg-gray-100 font-medium"
+    <!-- Navigation Links -->
+    <nav class="scroll-thin flex-1 overflow-y-auto px-3 py-4">
+      <p class="px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+        Navigation
+      </p>
+      <div class="space-y-1">
+        <RouterLink
+          v-for="link in sidebarLinks"
+          :key="link.name"
+          :to="link.to"
+          custom
+          v-slot="{ href, navigate, isActive }"
+        >
+          <a
+            :href="href"
+            @click="navigate"
+            :class="[
+              'group flex items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-brand-50 text-brand-700'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+            ]"
           >
-            <div class="flex items-center gap-2">
-              <component :is="link.icon" class="w-4 h-4" />
-              <span>{{ link.name }}</span>
-            </div>
+            <span
+              :class="[
+                'grid h-8 w-8 place-items-center rounded-lg transition-colors',
+                isActive
+                  ? 'bg-brand-600 text-white shadow-glow'
+                  : 'bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700',
+              ]"
+            >
+              <component :is="link.icon" class="h-4 w-4" />
+            </span>
+            <span class="flex-1">{{ link.name }}</span>
             <span
               v-if="link.name === 'Cart' && cartQuantity > 0"
-              class="bg-[#2a2b30] text-white text-xs font-semibold px-2 py-0.5 rounded-full"
+              class="rounded-full bg-brand-600 px-2 py-0.5 text-xs font-semibold text-white"
             >
               {{ cartQuantity }}
             </span>
-          </RouterLink>
-        </nav>
+          </a>
+        </RouterLink>
       </div>
+    </nav>
 
-      <!-- Bottom: User Info -->
-      <div class="relative px-4 py-4 text-xs" ref="dropdownRef">
-        <button
-          @click="toggleDropdown"
-          class="flex items-center gap-2 w-full text-left hover:bg-gray-100 p-2 rounded cursor-pointer"
-        >
-          <img :src="user.image" alt="User avatar" class="w-6 h-6 rounded-full" />
-          <span class="text-gray-700 truncate">{{ user.fullName }}</span>
-        </button>
-
-        <div
-          v-if="showDropdown"
-          class="absolute bottom-14 left-4 w-[90%] bg-white border border-gray-200 rounded shadow-md text-sm z-50"
-        >
-          <div class="font-semibold px-4 py-2">My Account</div>
-          <div class="h-px my-1 bg-[#e5e7eb]"></div>
-
-          <RouterLink to="/profile" class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100">
-            <ProfileIcon class="w-4 h-4" />
-            Profile
-          </RouterLink>
-
-          <div class="h-px my-1 bg-[#e5e7eb]"></div>
-
-          <button
-            @click="handleSignOut"
-            class="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100 text-left cursor-pointer"
-          >
-            <SignOutIcon class="w-4 h-4" />
-            Sign out
-          </button>
+    <!-- Bottom: User Info -->
+    <div class="relative shrink-0 border-t border-slate-200/70 p-3" ref="dropdownRef">
+      <!-- Loading Skeleton -->
+      <div v-if="isLoading" class="flex animate-pulse items-center gap-3 p-2">
+        <div class="h-9 w-9 rounded-full bg-slate-200"></div>
+        <div class="flex-1 space-y-2">
+          <div class="h-3 w-24 rounded bg-slate-200"></div>
+          <div class="h-2.5 w-32 rounded bg-slate-100"></div>
         </div>
       </div>
-    </template>
+
+      <!-- Error Fallback -->
+      <div v-else-if="isError" class="space-y-2 rounded-xl bg-rose-50 p-3 text-xs text-rose-600">
+        <p>Failed to load user data. Please try again later.</p>
+        <button @click="handleSignOut" class="flex items-center gap-1.5 font-semibold">
+          <SignOutIcon class="h-3.5 w-3.5" />
+          Sign out
+        </button>
+      </div>
+
+      <template v-else>
+        <button
+          @click="toggleDropdown"
+          :class="[
+            'flex w-full items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-slate-100',
+            showDropdown && 'bg-slate-100',
+          ]"
+        >
+          <img
+            :src="user.image"
+            alt="User avatar"
+            class="h-9 w-9 rounded-full bg-brand-50 object-cover shadow-soft ring-2 ring-white"
+          />
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-semibold text-slate-900">{{ user.fullName }}</p>
+            <p class="truncate text-xs text-slate-500">{{ user.email }}</p>
+          </div>
+          <svg
+            class="h-4 w-4 shrink-0 text-slate-400"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m7 15 5 5 5-5" />
+            <path d="m7 9 5-5 5 5" />
+          </svg>
+        </button>
+
+        <transition name="pop">
+          <div
+            v-if="showDropdown"
+            class="absolute right-3 bottom-[calc(100%-0.25rem)] left-3 z-50 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-1.5 text-sm shadow-lift"
+          >
+            <div class="px-3 py-2">
+              <p class="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                My Account
+              </p>
+            </div>
+
+            <RouterLink
+              to="/profile"
+              class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-700 transition-colors hover:bg-slate-100"
+            >
+              <ProfileIcon class="h-4 w-4 text-slate-500" />
+              Profile
+            </RouterLink>
+
+            <div class="my-1 h-px bg-slate-100"></div>
+
+            <button
+              @click="handleSignOut"
+              class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-rose-600 transition-colors hover:bg-rose-50"
+            >
+              <SignOutIcon class="h-4 w-4" />
+              Sign out
+            </button>
+          </div>
+        </transition>
+      </template>
+    </div>
   </aside>
 </template>
 
@@ -113,7 +171,6 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useCart } from '@/store'
 import { useQuery } from '@tanstack/vue-query'
 import { fetchCurrentUsers } from '@/service'
-import { SpinnerComponent } from '../ui'
 
 const props = defineProps<{
   isOpen: boolean
@@ -141,6 +198,7 @@ const {
 // Derived/computed user info
 const user = computed(() => ({
   fullName: `${userData.value?.firstName ?? ''} ${userData.value?.lastName ?? ''}`.trim(),
+  email: userData.value?.email ?? '',
   image: userData.value?.image ?? '',
 }))
 
@@ -181,3 +239,17 @@ onMounted(() => {
   window.addEventListener('storage', updateCartFromLocalStorage)
 })
 </script>
+
+<style scoped>
+.pop-enter-active,
+.pop-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.pop-enter-from,
+.pop-leave-to {
+  opacity: 0;
+  transform: translateY(6px) scale(0.98);
+}
+</style>
