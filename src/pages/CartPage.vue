@@ -1,117 +1,122 @@
 <template>
-  <div class="w-[100%]">
+  <div class="w-full">
     <template v-if="cart.length === 0">
       <!-- Empty Cart View -->
-      <div class="h-[60vh] w-full flex flex-col justify-center items-center px-4 text-center">
-        <SidebarTitle class="w-32 h-32 text-[#6F7074] mb-4" />
-        <div class="flex flex-col justify-center items-center gap-2">
-          <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Your cart is empty</h2>
-          <p class="text-md text-[#71717a] mb-4">Add some products to get started</p>
-        </div>
-        <RouterLink
-          to="/shop"
-          class="bg-gray-900 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-800"
+      <div class="empty-state min-h-[60vh]">
+        <span
+          class="mb-5 grid h-20 w-20 place-items-center rounded-3xl bg-brand-50 text-brand-500 ring-1 ring-brand-100"
         >
-          Continue Shopping
-        </RouterLink>
+          <SidebarTitle class="h-10 w-10" />
+        </span>
+        <h2 class="text-lg font-semibold text-slate-900 sm:text-xl">Your cart is empty</h2>
+        <p class="mt-1 mb-6 text-sm text-slate-500">Add some products to get started</p>
+        <RouterLink to="/shop" class="btn-primary">Continue Shopping</RouterLink>
       </div>
     </template>
 
     <template v-else>
       <!-- Cart Header -->
-      <div class="flex justify-between">
-        <div class="flex-col flex">
-          <h2 class="text-3xl font-bold mb-1">Shopping Cart</h2>
-          <p class="text-md text-gray-500 mb-6">{{ totalItems }} items in your cart</p>
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Shopping Cart</h1>
+          <p class="page-subtitle">{{ totalItems }} items in your cart</p>
         </div>
         <button
-          class="text-sm text-[#18181b] font-medium bg-white border border-[#e5e7eb] px-4 py-2 rounded m-auto mr-0 cursor-pointer hover:bg-gray-100"
+          class="btn-secondary hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
           @click="clearCart"
         >
+          <TrashIcon class="h-4 w-4" />
           Clear Cart
         </button>
       </div>
 
-      <div class="flex flex-col lg:flex-row gap-6">
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
         <!-- Cart Items -->
-        <div class="flex-1 space-y-4">
+        <div class="flex-1 space-y-3">
           <div
             v-for="item in cart"
             :key="item.id"
-            class="flex items-center justify-between p-4 shadow-sm border-1 border-[#e5e7eb] rounded-md"
+            class="card flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div class="flex items-center gap-4">
-              <img :src="item.thumbnail" alt="product image" class="w-24 h-24 rounded" />
-              <div>
-                <p class="font-semibold">{{ item.title }}</p>
-                <p class="font-bold text-2xl">${{ item.price.toFixed(2) }}</p>
+            <div class="flex min-w-0 items-center gap-4">
+              <img
+                :src="item.thumbnail"
+                alt="product image"
+                class="h-20 w-20 shrink-0 rounded-xl bg-slate-50 object-contain p-1 ring-1 ring-slate-100"
+              />
+              <div class="min-w-0">
+                <p class="truncate font-semibold text-slate-900">{{ item.title }}</p>
+                <p class="mt-0.5 text-sm text-slate-500">${{ item.price.toFixed(2) }} each</p>
               </div>
             </div>
 
             <!-- Quantity Controls -->
-            <div class="flex items-center gap-4">
-              <button
-                @click="decreaseQuantity(item)"
-                class="px-3 py-2 border border-[#e5e7eb] rounded cursor-pointer hover:bg-gray-100 font-bold"
+            <div class="flex items-center justify-between gap-4 sm:justify-end">
+              <div
+                class="inline-flex items-center rounded-xl border border-slate-200 bg-white shadow-soft"
               >
-                −
-              </button>
-              <span class="font-semibold">{{ item.quantity }}</span>
-              <button
-                @click="increaseQuantity(item)"
-                class="px-3 py-2 border border-[#e5e7eb] rounded cursor-pointer hover:bg-gray-100 font-bold"
-              >
-                +
-              </button>
-              <span class="ml-4 font-semibold">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                <button
+                  @click="decreaseQuantity(item)"
+                  class="grid h-9 w-9 place-items-center rounded-l-xl text-lg text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+                  aria-label="Decrease quantity"
+                >
+                  −
+                </button>
+                <span class="w-9 text-center text-sm font-semibold">{{ item.quantity }}</span>
+                <button
+                  @click="increaseQuantity(item)"
+                  class="grid h-9 w-9 place-items-center rounded-r-xl text-lg text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
+              <span class="w-24 text-right font-bold text-slate-900">
+                ${{ (item.price * item.quantity).toFixed(2) }}
+              </span>
               <button
                 @click="removeItem(item.id)"
-                class="px-3 py-2 cursor-pointer rounded hover:bg-gray-100 bg-white"
+                class="btn-icon hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                aria-label="Remove item"
               >
-                <TrashIcon class="w-5 h-5 text-red-600" />
+                <TrashIcon class="h-4 w-4" />
               </button>
             </div>
           </div>
         </div>
 
         <!-- Order Summary -->
-        <div class="w-full lg:w-1/3 border-1 border-[#e5e7eb] rounded p-6 space-y-4 shadow-sm">
-          <div class="gap-4 flex flex-col">
-            <h3 class="text-2xl font-semibold mb-2">Order Summary</h3>
-            <div class="flex flex-col space-y-2 gap-2">
-              <div class="flex justify-between">
-                <span>Subtotal</span>
-                <span>${{ subtotal.toFixed(2) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Shipping</span>
-                <span>Free</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Tax</span>
-                <span>${{ tax.toFixed(2) }}</span>
-              </div>
-              <hr />
-              <div class="flex justify-between font-bold text-lg">
-                <span>Total</span>
-                <span>${{ total.toFixed(2) }}</span>
-              </div>
+        <div class="card w-full space-y-5 p-6 lg:sticky lg:top-24 lg:w-96">
+          <h3 class="text-lg font-semibold text-slate-900">Order Summary</h3>
+          <div class="flex flex-col gap-3 text-sm">
+            <div class="flex justify-between text-slate-600">
+              <span>Subtotal</span>
+              <span class="font-medium text-slate-900">${{ subtotal.toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>Shipping</span>
+              <span class="badge bg-emerald-50 py-0.5 text-emerald-700">Free</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>Tax</span>
+              <span class="font-medium text-slate-900">${{ tax.toFixed(2) }}</span>
+            </div>
+            <div class="border-t border-dashed border-slate-200"></div>
+            <div class="flex items-baseline justify-between">
+              <span class="font-semibold text-slate-900">Total</span>
+              <span class="text-2xl font-bold tracking-tight text-slate-900">
+                ${{ total.toFixed(2) }}
+              </span>
             </div>
           </div>
 
-          <button
-            @click="router.push('/checkout')"
-            class="w-full flex items-center justify-center gap-4 px-4 py-3 rounded-md cursor-pointer bg-[#2a2b30] hover:bg-[#3a3b40] transition-colors duration-200 text-white font-medium"
-          >
-            Proceed to Checkout
-          </button>
+          <div class="space-y-2">
+            <button @click="router.push('/checkout')" class="btn-primary w-full py-3">
+              Proceed to Checkout
+            </button>
 
-          <button
-            @click="router.push('/shop')"
-            class="w-full border border-[#e5e7eb] py-2 rounded cursor-pointer hover:bg-gray-100 font-medium"
-          >
-            Continue Shopping
-          </button>
+            <button @click="router.push('/shop')" class="btn-ghost w-full">Continue Shopping</button>
+          </div>
         </div>
       </div>
     </template>

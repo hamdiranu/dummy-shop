@@ -1,34 +1,46 @@
 <template>
   <div class="w-full">
-    <h1 class="text-3xl font-bold">Checkout</h1>
-    <p class="text-md text-gray-500 mb-6">Complete your purchase</p>
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Checkout</h1>
+        <p class="page-subtitle">Complete your purchase</p>
+      </div>
+    </div>
 
     <form @submit.prevent="completeOrder">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <!-- Left Side -->
-        <div class="lg:col-span-2 space-y-6">
+        <div class="space-y-6 lg:col-span-2">
           <!-- Shipping -->
-          <section class="shadow-sm border-1 border-[#e5e7eb] p-6 rounded-md">
-            <h2 class="text-2xl font-semibold mb-4">Shipping Information</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <section class="card p-6">
+            <div class="mb-5 flex items-center gap-3">
+              <span
+                class="grid h-8 w-8 place-items-center rounded-full bg-brand-600 text-sm font-bold text-white shadow-glow"
+              >
+                1
+              </span>
+              <h2 class="text-lg font-semibold text-slate-900">Shipping Information</h2>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <BaseInput
                 v-for="field in shippingFields"
                 :key="field.model"
                 v-model="form[field.model]"
                 v-bind="field.props"
                 :error="v$.form[field.model]?.$error"
+                :error-message="fieldError('form', field.model)"
               />
               <BaseInput
                 v-model="form.address"
                 label="Address"
                 placeholder="Address"
-                class="col-span-2"
+                class="sm:col-span-2"
                 :error="v$.form.address.$error"
-                error-message="Required"
+                :error-message="fieldError('form', 'address')"
                 required
               />
             </div>
-            <div class="flex flex-col sm:flex-row gap-4 mt-4">
+            <div class="mt-4 flex flex-col gap-4 sm:flex-row">
               <BaseInput
                 v-for="field in ['city', 'state', 'zip']"
                 :key="field"
@@ -37,73 +49,86 @@
                 :placeholder="capitalize(field)"
                 class="w-full"
                 :error="v$.form[field]?.$error"
-                error-message="Required"
+                :error-message="fieldError('form', field)"
                 required
               />
             </div>
           </section>
 
           <!-- Payment -->
-          <section class="shadow-sm border-1 border-[#e5e7eb] p-6 rounded-md">
-            <h2 class="text-2xl font-semibold mb-4">Payment Information</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <section class="card p-6">
+            <div class="mb-5 flex items-center gap-3">
+              <span
+                class="grid h-8 w-8 place-items-center rounded-full bg-brand-600 text-sm font-bold text-white shadow-glow"
+              >
+                2
+              </span>
+              <h2 class="text-lg font-semibold text-slate-900">Payment Information</h2>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <BaseInput
                 v-for="field in paymentFields"
                 :key="field.model"
                 v-model="payment[field.model]"
                 v-bind="field.props"
                 :error="v$.payment[field.model]?.$error"
+                :error-message="fieldError('payment', field.model)"
               />
             </div>
           </section>
         </div>
 
         <!-- Right Side -->
-        <div class="shadow-sm border-1 border-[#e5e7eb] p-6 rounded-md space-y-4 h-fit">
-          <h2 class="text-2xl font-semibold">Order Summary</h2>
-          <div class="flex flex-col gap-0 max-h-105 overflow-y-auto pr-2">
-            <div v-for="item in cartItems" :key="item.id" class="flex justify-between text-sm">
-              <div class="flex items-center gap-2">
-                <img :src="item.thumbnail" class="w-16 h-16 rounded" />
-                <div>
-                  <p class="font-medium text-sm">{{ item.title }}</p>
-                  <p class="text-sm text-gray-500">Qty: {{ item.quantity }}</p>
-                </div>
+        <div class="card space-y-5 p-6 lg:sticky lg:top-24">
+          <h2 class="text-lg font-semibold text-slate-900">Order Summary</h2>
+          <div class="scroll-thin flex max-h-105 flex-col gap-3 overflow-y-auto pt-2 pr-2">
+            <div v-for="item in cartItems" :key="item.id" class="flex items-center gap-3">
+              <div class="relative shrink-0">
+                <img
+                  :src="item.thumbnail"
+                  class="h-14 w-14 rounded-xl bg-slate-50 object-contain p-1 ring-1 ring-slate-100"
+                />
+                <span
+                  class="absolute -top-1.5 -right-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-slate-900 px-1 text-[10px] font-bold text-white ring-2 ring-white"
+                >
+                  {{ item.quantity }}
+                </span>
               </div>
-              <div class="font-medium text-sm m-auto mr-0">
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-slate-900">{{ item.title }}</p>
+                <p class="text-xs text-slate-500">Qty: {{ item.quantity }}</p>
+              </div>
+              <div class="shrink-0 text-sm font-semibold text-slate-900">
                 ${{ (item.price * item.quantity).toFixed(2) }}
               </div>
             </div>
           </div>
 
-          <hr class="border-1 border-[#e5e7eb]" />
+          <div class="border-t border-slate-100"></div>
 
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-3">
             <div
               v-for="line in summaryLines"
               :key="line.label"
               class="flex justify-between text-sm"
             >
-              <span class="font-normal text-base text-[#09090b]">{{ line.label }}</span>
-              <span class="font-medium text-[#09090b]">{{
+              <span class="text-slate-600">{{ line.label }}</span>
+              <span class="font-medium text-slate-900">{{
                 line.value > 0 ? `$${line.value.toFixed(2)}` : 'Free'
               }}</span>
             </div>
           </div>
 
-          <hr class="border-1 border-[#e5e7eb]" />
+          <div class="border-t border-dashed border-slate-200"></div>
 
-          <div class="flex justify-between font-semibold">
-            <span class="text-lg font-bold text-[#09090b]">Total</span>
-            <span class="font-medium text-sm text-[#09090b]">${{ total.toFixed(2) }}</span>
+          <div class="flex items-baseline justify-between">
+            <span class="font-semibold text-slate-900">Total</span>
+            <span class="text-2xl font-bold tracking-tight text-slate-900">
+              ${{ total.toFixed(2) }}
+            </span>
           </div>
 
-          <button
-            type="submit"
-            class="w-full px-4 py-3 rounded-md bg-[#2a2b30] hover:bg-[#3a3b40] text-white font-medium transition-colors"
-          >
-            Complete Order
-          </button>
+          <button type="submit" class="btn-primary w-full py-3">Complete Order</button>
         </div>
       </div>
     </form>
@@ -111,9 +136,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, watchEffect } from 'vue'
+import { reactive, computed, watchEffect, unref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import useVuelidate from '@vuelidate/core'
+import useVuelidate, { type ErrorObject } from '@vuelidate/core'
 import { required, email, numeric, minLength, helpers } from '@vuelidate/validators'
 import { useCart } from '@/store'
 import { fetchCurrentUsers, type ICartItem } from '@/service'
@@ -146,30 +171,15 @@ const capitalize = (word: string) => word.charAt(0).toUpperCase() + word.slice(1
 const shippingFields = [
   {
     model: 'firstName',
-    props: {
-      label: 'First Name',
-      placeholder: 'First Name',
-      required: true,
-      errorMessage: 'Required',
-    },
+    props: { label: 'First Name', placeholder: 'First Name', required: true },
   },
   {
     model: 'lastName',
-    props: {
-      label: 'Last Name',
-      placeholder: 'Last Name',
-      required: true,
-      errorMessage: 'Required',
-    },
+    props: { label: 'Last Name', placeholder: 'Last Name', required: true },
   },
   {
     model: 'email',
-    props: {
-      label: 'Email',
-      placeholder: 'Email',
-      required: true,
-      errorMessage: 'Valid email required',
-    },
+    props: { label: 'Email', placeholder: 'Email', required: true },
   },
   { model: 'phone', props: { label: 'Phone', placeholder: 'Phone' } },
 ]
@@ -181,27 +191,25 @@ const paymentFields = [
       label: 'Cardholder Name',
       placeholder: 'Cardholder Name',
       required: true,
-      errorMessage: 'Required',
-      class: 'col-span-2',
+      class: 'sm:col-span-2',
     },
   },
   {
     model: 'cardNumber',
     props: {
       label: 'Card Number',
-      placeholder: 'Card Number',
+      placeholder: 'At least 12 digits',
       required: true,
-      errorMessage: 'Card number required',
-      class: 'col-span-2',
+      class: 'sm:col-span-2',
     },
   },
   {
     model: 'expiry',
-    props: { label: 'Expiry', placeholder: 'MM/YY', required: true, errorMessage: 'Required' },
+    props: { label: 'Expiry', placeholder: 'MM/YY', required: true },
   },
   {
     model: 'cvv',
-    props: { label: 'CVV', placeholder: 'CVV', required: true, errorMessage: 'Required' },
+    props: { label: 'CVV', placeholder: 'CVV', required: true },
   },
 ]
 
@@ -221,25 +229,46 @@ const total = computed(() => subtotal.value + tax.value)
 
 const expiryFormat = helpers.regex(/^((0[1-9])|(1[0-2]))\/\d{2}$/) // MM/YY
 
+const requiredField = helpers.withMessage('Required', required)
+const digitsOnly = helpers.withMessage('Digits only, no spaces or dashes', numeric)
+
 const rules = {
   form: {
-    firstName: { required },
-    lastName: { required },
-    email: { required, email },
-    address: { required },
-    city: { required },
-    state: { required },
-    zip: { required },
+    firstName: { required: requiredField },
+    lastName: { required: requiredField },
+    email: { required: requiredField, email: helpers.withMessage('Enter a valid email', email) },
+    address: { required: requiredField },
+    city: { required: requiredField },
+    state: { required: requiredField },
+    zip: { required: requiredField },
   },
   payment: {
-    cardName: { required },
-    cardNumber: { required, numeric, minLength: minLength(12) },
-    expiry: { required, expiryFormat },
-    cvv: { required, numeric, minLength: minLength(3) },
+    cardName: { required: requiredField },
+    cardNumber: {
+      required: requiredField,
+      numeric: digitsOnly,
+      minLength: helpers.withMessage('Card number must be at least 12 digits', minLength(12)),
+    },
+    expiry: {
+      required: requiredField,
+      expiryFormat: helpers.withMessage('Use the MM/YY format', expiryFormat),
+    },
+    cvv: {
+      required: requiredField,
+      numeric: digitsOnly,
+      minLength: helpers.withMessage('CVV must be at least 3 digits', minLength(3)),
+    },
   },
 }
 
 const v$ = useVuelidate(rules, { form, payment })
+
+// Message of the first rule a field fails, so the hint matches what is actually wrong
+const fieldError = (group: 'form' | 'payment', key: string) => {
+  const fields = v$.value[group] as unknown as Record<string, { $errors: ErrorObject[] }>
+  const message = fields[key]?.$errors[0]?.$message
+  return message ? unref(message) : ''
+}
 
 const { data: userData } = useQuery({
   queryKey: ['user'],
@@ -265,7 +294,7 @@ const router = useRouter()
 const completeOrder = async () => {
   const valid = await v$.value.$validate()
   if (!valid) {
-    showSnackbar('Error', 'Please fill in all required fields')
+    showSnackbar('Error', 'Please fix the highlighted fields')
     return
   }
 

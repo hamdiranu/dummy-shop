@@ -1,8 +1,8 @@
 <template>
-  <div class="gap-2 flex flex-col w-full">
-    <label v-if="label" class="block text-sm font-medium">
+  <div class="flex w-full flex-col gap-1.5">
+    <label v-if="label" class="block text-sm font-medium text-slate-700">
       {{ label }}
-      <span v-if="required" class="text-red-500">*</span>
+      <span v-if="required" class="text-rose-500">*</span>
     </label>
 
     <component
@@ -10,15 +10,12 @@
       :type="type !== 'textarea' ? type : undefined"
       :placeholder="placeholder"
       :rows="type === 'textarea' ? 4 : undefined"
-      :class="[
-        'w-full border px-3 py-2 rounded text-sm',
-        error ? 'border-red-500' : 'border-[#D9D9E6]',
-      ]"
+      :class="['input', type === 'textarea' && 'resize-none', error && 'input-error']"
       :value="modelValue"
       @input="onInput"
     />
 
-    <p v-if="error" class="text-red-500 text-xs mt-1">{{ errorMessage }}</p>
+    <p v-if="error" class="text-xs font-medium text-rose-500">{{ errorMessage }}</p>
   </div>
 </template>
 

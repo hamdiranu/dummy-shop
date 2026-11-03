@@ -1,67 +1,84 @@
 <template>
-  <div class="w-full mx-auto">
-    <h1 class="text-3xl font-bold mb-1">Order History</h1>
-    <p class="text-base text-gray-500 mb-6">Track and manage your orders</p>
+  <div class="mx-auto w-full">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Order History</h1>
+        <p class="page-subtitle">Track and manage your orders</p>
+      </div>
+    </div>
 
-    <div v-if="orders.length > 0">
+    <div v-if="orders.length > 0" class="space-y-4">
       <div
         v-for="order in orders"
         :key="order.id"
-        class="border border-[#e5e7eb] rounded-lg px-6 py-4 mb-4 shadow-sm"
+        class="card p-5 transition-shadow duration-300 hover:shadow-lift sm:p-6"
       >
-        <div class="flex justify-between items-start flex-wrap gap-4">
-          <div class="flex flex-col gap-2">
-            <div class="flex gap-2 items-center">
-              <h2 class="text-2xl font-semibold">Order #{{ order.id }}</h2>
-              <span
-                class="text-xs text-white bg-[#22C55E] hover:bg-[#27272f] px-3 py-1.5 rounded-xl font-semibold transition-colors"
-              >
-                {{ order.status }}
-              </span>
-            </div>
-            <div class="flex items-center gap-4 text-sm text-gray-600">
-              <div class="flex items-center gap-1">
-                <DateIcon class="w-4 h-4" />
-                {{ new Date(order.date).toLocaleDateString() }}
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="flex min-w-0 items-start gap-4">
+            <span
+              class="hidden h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 sm:grid"
+            >
+              <OrderIcons class="h-5 w-5" />
+            </span>
+            <div class="flex min-w-0 flex-col gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-lg font-semibold text-slate-900">Order #{{ order.id }}</h2>
+                <span class="badge bg-emerald-50 text-emerald-700 capitalize ring-1 ring-emerald-200">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                  {{ order.status }}
+                </span>
               </div>
-              <div class="flex items-center gap-1">
-                <DollarIcon class="w-4 h-4" />
-                ${{ order.total.toFixed(2) }}
-              </div>
-              <div class="flex items-center gap-1">
-                <ProductIcon class="w-4 h-4" />
-                {{ order.totalQuantity }} items
+              <div class="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-slate-500">
+                <div class="flex items-center gap-1.5">
+                  <DateIcon class="h-4 w-4 text-slate-400" />
+                  {{ new Date(order.date).toLocaleDateString() }}
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <DollarIcon class="h-4 w-4 text-slate-400" />
+                  <span class="font-semibold text-slate-700">${{ order.total.toFixed(2) }}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <ProductIcon class="h-4 w-4 text-slate-400" />
+                  {{ order.totalQuantity }} items
+                </div>
               </div>
             </div>
           </div>
 
-          <button
-            class="flex items-center gap-2 text-sm font-medium text-gray-700 border border-[#e5e7eb] rounded px-3 py-2 hover:bg-gray-100 transition cursor-pointer"
-            @click="openOrderDetail(order)"
-          >
-            <EyeIcon class="w-4 h-4" />
+          <button class="btn-secondary" @click="openOrderDetail(order)">
+            <EyeIcon class="h-4 w-4" />
             View Details
           </button>
         </div>
 
-        <div class="flex mt-8 mb-4 gap-3 flex-wrap">
+        <div class="mt-5 flex flex-wrap gap-2 border-t border-slate-100 pt-5">
           <img
-            v-for="item in order.items"
+            v-for="item in order.items.slice(0, maxThumbnails)"
             :key="item.id"
             :src="item.thumbnail"
-            class="w-16 h-16 rounded object-cover"
+            :title="item.title"
+            class="h-14 w-14 rounded-xl bg-slate-50 object-contain p-1 ring-1 ring-slate-200/70"
             alt="product"
           />
+          <span
+            v-if="order.items.length > maxThumbnails"
+            class="grid h-14 w-14 place-items-center rounded-xl bg-slate-100 text-sm font-semibold text-slate-500"
+          >
+            +{{ order.items.length - maxThumbnails }}
+          </span>
         </div>
       </div>
     </div>
 
-    <div v-else class="h-[60vh] w-full flex flex-col justify-center items-center px-4 text-center">
-      <ProductIcon class="w-32 h-32 text-[#6F7074] mb-4" />
-      <div class="flex flex-col justify-center items-center gap-2">
-        <h2 class="text-lg sm:text-xl font-semibold text-gray-800">No orders yet</h2>
-        <p class="text-md text-[#71717a] mb-4">Your order history will appear here</p>
-      </div>
+    <div v-else class="empty-state min-h-[60vh]">
+      <span
+        class="mb-5 grid h-20 w-20 place-items-center rounded-3xl bg-brand-50 text-brand-500 ring-1 ring-brand-100"
+      >
+        <ProductIcon class="h-10 w-10" />
+      </span>
+      <h2 class="text-lg font-semibold text-slate-900 sm:text-xl">No orders yet</h2>
+      <p class="mt-1 mb-6 text-sm text-slate-500">Your order history will appear here</p>
+      <RouterLink to="/shop" class="btn-primary">Start Shopping</RouterLink>
     </div>
   </div>
 
@@ -70,9 +87,12 @@
 
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
-import { DateIcon, DollarIcon, EyeIcon, ProductIcon } from '@/assets/icons'
+import { RouterLink } from 'vue-router'
+import { DateIcon, DollarIcon, EyeIcon, OrderIcons, ProductIcon } from '@/assets/icons'
 import { OrderDetailModal } from '@/components/ui'
 import type { IOrderSaved } from '@/service'
+
+const maxThumbnails = 8
 
 const orders = ref<IOrderSaved[]>([])
 const selectedOrder = ref<IOrderSaved | null>(null)

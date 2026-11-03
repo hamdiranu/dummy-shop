@@ -9,6 +9,8 @@ import OrderDetailModal from './OrderDetailModal.vue'
 import BaseModal from './BaseModal.vue'
 import ProductModal from './ProductModal.vue'
 import SpinnerComponent from './SpinnerComponent.vue'
+import LoginMascot from './LoginMascot.vue'
+import PageBackground from './PageBackground.vue'
 
 export {
   BarChartComponent,
@@ -22,4 +24,6 @@ export {
   BaseModal,
   ProductModal,
   SpinnerComponent,
+  LoginMascot,
+  PageBackground,
 }
