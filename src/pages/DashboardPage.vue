@@ -17,7 +17,13 @@
         <div>
           <p class="text-sm font-medium text-white/70">{{ today }}</p>
           <h1 class="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
-            Welcome back{{ meData?.firstName ? `, ${meData.firstName}` : '' }}
+            <ShinyText
+              :text="`Welcome back${meData?.firstName ? `, ${meData.firstName}` : ''}`"
+              color="#dfe4ff"
+              shine-color="#ffffff"
+              :speed="2.5"
+              :delay="3"
+            />
           </h1>
           <p class="mt-1 text-sm text-white/80">Overview of your e-commerce metrics</p>
         </div>
@@ -65,7 +71,8 @@
       />
       <DashboardCard
         title="Total Revenue"
-        :value="formattedRevenue"
+        :value="totalRevenue"
+        :format="formatCurrency"
         subtitle="From all carts"
         :icon="RevenueIcon"
         :isLoading="isFetchingCarts"
@@ -98,6 +105,7 @@
 
 <script setup lang="ts">
 import { DashboardCard, BarChartComponent, PieChartComponent, ChartCard } from '@/components/ui'
+import { ShinyText } from '@/components/bits'
 import { ProductIcon, CartIcons, RevenueIcon, UsersIcon, ShopIcon } from '@/assets/icons'
 import { useQuery } from '@tanstack/vue-query'
 import { fetchCarts, fetchUsers, fetchProducts, fetchCurrentUsers } from '@/service/service'
@@ -150,13 +158,12 @@ const { data: cartData, isFetching: isFetchingCarts } = useQuery({
   queryFn: () => fetchCarts(),
 })
 
-const formattedRevenue = computed(() => {
-  const total = cartData.value?.carts.reduce((sum, cart) => sum + cart.discountedTotal, 0) || 0
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(total)
-})
+const totalRevenue = computed(
+  () => cartData.value?.carts.reduce((sum, cart) => sum + cart.discountedTotal, 0) || 0,
+)
+
+const currencyFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+const formatCurrency = (value: number) => currencyFormatter.format(value)
 
 // Curated palette so the chart matches the UI instead of random colors on each load
 const chartPalette = [

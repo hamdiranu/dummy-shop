@@ -1,7 +1,8 @@
 <template>
-  <div
+  <SpotlightCard
     v-if="!isLoading"
-    class="card group relative overflow-hidden p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift"
+    :spotlight-color="accentStyle.spotlight"
+    class="card group p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift"
   >
     <div
       aria-hidden="true"
@@ -17,11 +18,13 @@
         <component :is="icon" class="h-5 w-5" />
       </span>
     </div>
-    <h2 class="relative mt-2 text-2xl font-bold tracking-tight break-words text-slate-900 tabular-nums sm:text-[1.75rem]">
-      {{ value }}
+    <h2
+      class="relative mt-2 text-2xl font-bold tracking-tight break-words text-slate-900 tabular-nums sm:text-[1.75rem]"
+    >
+      <CountUp :to="value" :format="format" separator="," :duration="1.6" />
     </h2>
     <p class="relative mt-1 text-xs font-medium text-slate-500">{{ subtitle }}</p>
-  </div>
+  </SpotlightCard>
   <div v-else class="card animate-pulse p-5">
     <div class="flex items-center justify-between">
       <div class="h-3.5 w-1/2 rounded bg-slate-200"></div>
@@ -34,11 +37,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { CountUp, SpotlightCard } from '@/components/bits'
 
 const props = defineProps<{
   title: string
   subtitle: string
-  value: string | number
+  value: number
+  // How to display the number, e.g. as currency; plain grouped digits by default
+  format?: (value: number) => string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon?: any // or define proper type like Component
   isLoading?: boolean
@@ -46,13 +52,26 @@ const props = defineProps<{
 }>()
 
 const accents = {
-  brand: { chip: 'bg-brand-50 text-brand-600 ring-1 ring-brand-100', glow: 'bg-brand-200' },
+  brand: {
+    chip: 'bg-brand-50 text-brand-600 ring-1 ring-brand-100',
+    glow: 'bg-brand-200',
+    spotlight: 'rgba(99, 102, 241, 0.16)',
+  },
   emerald: {
     chip: 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100',
     glow: 'bg-emerald-200',
+    spotlight: 'rgba(16, 185, 129, 0.16)',
   },
-  amber: { chip: 'bg-amber-50 text-amber-600 ring-1 ring-amber-100', glow: 'bg-amber-200' },
-  rose: { chip: 'bg-rose-50 text-rose-600 ring-1 ring-rose-100', glow: 'bg-rose-200' },
+  amber: {
+    chip: 'bg-amber-50 text-amber-600 ring-1 ring-amber-100',
+    glow: 'bg-amber-200',
+    spotlight: 'rgba(245, 158, 11, 0.18)',
+  },
+  rose: {
+    chip: 'bg-rose-50 text-rose-600 ring-1 ring-rose-100',
+    glow: 'bg-rose-200',
+    spotlight: 'rgba(244, 63, 94, 0.14)',
+  },
 }
 
 const accentStyle = computed(() => accents[props.accent ?? 'brand'])

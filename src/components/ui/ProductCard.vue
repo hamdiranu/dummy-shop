@@ -1,8 +1,8 @@
 <template>
-  <div
+  <SpotlightCard
     v-if="!isLoading"
-    ref="rootEl"
-    class="card group relative flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+    ref="spotlight"
+    class="card group flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
   >
     <!-- Image -->
     <div class="relative aspect-[4/3] overflow-hidden bg-linear-to-br from-slate-50 to-slate-100">
@@ -44,10 +44,7 @@
           {{ product.category }}
         </span>
         <span
-          :class="[
-            'text-xs font-medium',
-            product.stock < 10 ? 'text-amber-600' : 'text-slate-400',
-          ]"
+          :class="['text-xs font-medium', product.stock < 10 ? 'text-amber-600' : 'text-slate-400']"
         >
           Stock: {{ product.stock }}
         </span>
@@ -80,12 +77,18 @@
           <TrashIcon class="h-4 w-4" />
         </button>
       </div>
-      <button v-else class="btn-primary w-full" @click="emit('add-to-cart', product)">
+      <!-- data-add-to-cart: the shop page's ClickSpark only sparks on this button -->
+      <button
+        v-else
+        data-add-to-cart
+        class="btn-primary w-full"
+        @click="emit('add-to-cart', product)"
+      >
         <CartIcons class="h-4 w-4" />
         Add to Cart
       </button>
     </div>
-  </div>
+  </SpotlightCard>
 
   <div v-else class="card w-full animate-pulse overflow-hidden">
     <div class="aspect-[4/3] bg-slate-100"></div>
@@ -105,8 +108,9 @@
 
 <script setup lang="ts">
 import { CartIcons, EditIcon, TrashIcon } from '@/assets/icons'
+import { SpotlightCard } from '@/components/bits'
 import type { IProduct } from '@/service/product/product.type'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 defineProps<{
   product: IProduct
@@ -120,7 +124,8 @@ const emit = defineEmits<{
   (e: 'delete-product'): void
 }>()
 
-const rootEl = ref<HTMLElement | null>(null)
+const spotlight = ref<InstanceType<typeof SpotlightCard> | null>(null)
+const rootEl = computed(() => spotlight.value?.el ?? null)
 defineExpose({ rootEl }) // 👈 expose the element
 
 const imageLoaded = ref(false)

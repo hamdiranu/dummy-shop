@@ -46,20 +46,28 @@
     </div>
 
     <div v-if="products.length > 0">
-      <div
+      <!-- Sparks burst from "Add to Cart" only -->
+      <ClickSpark
         v-if="!isLoading"
-        class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        selector="[data-add-to-cart]"
+        spark-color="#6366f1"
+        :spark-count="10"
+        :spark-radius="26"
+        :spark-size="12"
+        :duration="450"
       >
-        <!-- Products -->
-        <ProductCard
-          v-for="product in products"
-          :key="product.id"
-          :product="product"
-          :isLoading="isFetching"
-          type="shop"
-          @add-to-cart="handleAddToCart"
-        />
-      </div>
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <!-- Products -->
+          <ProductCard
+            v-for="product in products"
+            :key="product.id"
+            :product="product"
+            :isLoading="isFetching"
+            type="shop"
+            @add-to-cart="handleAddToCart"
+          />
+        </div>
+      </ClickSpark>
       <!-- Intersection Observer target -->
       <div v-if="hasNextPage" class="flex h-10 w-full items-center justify-center">
         <!-- wrapper div gets the ref, not the component -->
@@ -82,6 +90,7 @@
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useInfiniteQuery, useQuery } from '@tanstack/vue-query'
 import { ProductCard, SpinnerComponent } from '@/components/ui'
+import { ClickSpark } from '@/components/bits'
 import { fetchCategories, fetchProducts, fetchProductsByCategory } from '@/service'
 import { EmptyBoxIcon, MagnifyGlassIcon } from '@/assets/icons'
 import type { IProduct } from '@/service/product/product.type'
