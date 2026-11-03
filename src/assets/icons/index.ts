@@ -19,6 +19,10 @@ import DollarIcon from './dollar.svg'
 import CrossIcon from './cross.svg'
 import CircularIcon from './circular.svg'
 import EmptyBoxIcon from './empty-box.svg'
+import LockIcon from './lock.svg'
+import EyeOffIcon from './eye-off.svg'
+import ArrowRightIcon from './arrow-right.svg'
+import InfoIcon from './info.svg'
 
 export {
   CartIcons,
@@ -42,4 +46,8 @@ export {
   CrossIcon,
   CircularIcon,
   EmptyBoxIcon,
+  LockIcon,
+  EyeOffIcon,
+  ArrowRightIcon,
+  InfoIcon,
 }

@@ -1,10 +1,7 @@
 <template>
-  <div class="relative min-h-screen text-slate-900">
-    <!-- Soft brand glow behind the content -->
-    <div
-      aria-hidden="true"
-      class="pointer-events-none fixed inset-x-0 top-0 h-96 bg-[radial-gradient(55%_60%_at_75%_0%,rgb(99_102_241/0.12),transparent)]"
-    ></div>
+  <div class="relative isolate min-h-screen text-slate-900">
+    <!-- Same background as the login page -->
+    <PageBackground />
 
     <Sidebar :isOpen="isSidebarOpen" />
 
@@ -39,7 +36,7 @@ import { ref, watch } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import Sidebar from './SideBar.vue'
 import Navbar from './NavBar.vue'
-import { SnackBar } from '../ui'
+import { PageBackground, SnackBar } from '../ui'
 
 const isDesktop = () => window.matchMedia('(min-width: 768px)').matches
 
